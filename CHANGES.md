@@ -28,9 +28,7 @@
 - Modification :
     - Chargement paresseux des images.
     
-## version 9.3.00
-- Modification : 
-    - Tri des galeries module version 2.0
+## version 9.2.27
 - Corrections :
     - Pages d'administration, thème spécifique
         - Thème inactif lorsque la réécriture est activée.

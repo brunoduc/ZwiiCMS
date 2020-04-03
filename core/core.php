@@ -1345,7 +1345,7 @@ class common {
 		// Version 9.2.27
 		if($this->getData(['core', 'dataVersion']) < 9227) {
 			// Forcer la régénération du thème
-			if (file_exists(self::DATA_DIR.'theme.css') === false) {
+			if (file_exists(self::DATA_DIR.'theme.css')) {
 				unlink (self::DATA_DIR.'theme.css');
 			}
 			$this->setData(['core', 'dataVersion', 9227]);
@@ -1353,6 +1353,31 @@ class common {
 		// Version 10.0.00
 		if($this->getData(['core', 'dataVersion']) < 10000) {
 			$this->setData(['config', 'faviconDark','faviconDark.ico']);
+			// Numérotation des galeries
+			$pageList = array();
+			foreach ($this->getHierarchy(null,null,null) as $parentKey=>$parentValue) {
+				$pageList [] = $parentKey;
+				foreach ($parentValue as $childKey) {
+					$pageList [] = $childKey;
+				}
+			}	
+			// Parcourir toutes les pages
+			foreach ($pageList as $parentKey => $parent) {
+				//La page a une galerie
+				if ($this->getData(['page',$parent,'moduleId']) === 'gallery' ) {
+					// Parcourir les dossiers de la galerie
+					$tempData =  $this->getData(['module', $parent]);	
+					$i = 1;
+					foreach ($tempData as $galleryKey => $galleryItem) {
+						if ( $this->getdata(['module',$parent,$galleryKey,'config','sort']) === NULL)  {
+							$this->setdata(['module',$parent,$galleryKey,'config','sort','SORT_ASC']);
+						}
+						if ( $this->getdata(['module',$parent,$galleryKey,'config','position']) === NULL) {
+							$this->setdata(['module',$parent,$galleryKey,'config','position',$i++]);
+						}						
+					}					
+				}
+			}	
 			$this->setData(['core', 'dataVersion', 10000]);	
 		}
 		// Version 11.0.00
@@ -2585,6 +2610,9 @@ class layout extends common {
 					OR $this->getUrl(0) === ''
 				) {
 					$leftItems .= '<li><a href="' . helper::baseUrl() . 'page/edit/' . $this->getUrl(0) . '" data-tippy-content="Modifier la page">' . template::ico('pencil') . '</a></li>';
+					if ($this->getData(['page', $this->getUrl(),'moduleId'])) {
+						$leftItems .= '<li><a href="' . helper::baseUrl() . $this->getUrl() . '/config' . '" data-tippy-content="Configurer le module">' . template::ico('gear') . '</a></li>';					
+					}
 					$leftItems .= '<li><a id="pageDelete" href="' . helper::baseUrl() . 'page/delete/' . $this->getUrl(0) . '&csrf=' . $_SESSION['csrf'] . '" data-tippy-content="Effacer la page">' . template::ico('trash') . '</a></li>';					
 				}
 			}

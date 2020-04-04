@@ -81,7 +81,10 @@ class install extends common {
 						'group' => self::GROUP_ADMIN,
 						'lastname' => $userLastname,
 						'mail' => $userMail,
-						'password' => $this->getInput('installPassword', helper::FILTER_PASSWORD, true)
+						'password' => $this->getInput('installPassword', helper::FILTER_PASSWORD, true),
+						'editing' => false,
+						'editing_time' => 0,
+						'editing_csrf' => ''
 					]
 				]);
 				if ($success === true) { // Formulaire complété envoi du mail											

@@ -11,6 +11,13 @@
  */
 
 var core = {};
+	 
+/*
+ *	Script utilisé pour contrôler la fermeture du navigateur si une page était en édition
+ */
+ setInterval(function(){
+	$.get( './?modifeditingtime', 'false');
+},60000);
 
 /**
  * Crée un message d'alerte

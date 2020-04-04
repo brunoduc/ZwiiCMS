@@ -24,7 +24,10 @@ class init extends common {
 			'title' => 'Votre site en quelques clics !',
 			'proxyUrl' => "",
 			'proxyPort' => "",
-			'proxyType' => "tcp://"
+			'proxyType' => "tcp://",
+			'editing' => false,
+			'editing_csrf' => '',
+			'editing_time' => 0	
 		],
 		'core' => [
 			'dataVersion' => 10000,
@@ -59,7 +62,10 @@ class init extends common {
 			'barRight' => '',
 			'displayMenu' => 'none',
 			'hideMenuSide' => false,
-			'hideMenuChildren' =>false
+			'hideMenuChildren' =>false,
+			'editing' => false,
+			'editing_csrf' => '',
+			'editing_time' => 0	
 			]
 		],
 		'module' => [],
@@ -159,6 +165,9 @@ class init extends common {
 				'textTransform' => 'none'
 			],
 			'version' => 0,
+			'editing' => false,
+			'editing_csrf' => '',
+			'editing_time' => 0	
 		]
     ];
 
@@ -190,7 +199,10 @@ class init extends common {
 			'barRight' => '',
 			'displayMenu' => 'none',
 			'hideMenuSide' => false,
-			'hideMenuChildren' =>false
+			'hideMenuChildren' =>false,
+			'editing' => false,
+			'editing_csrf' => '',
+			'editing_time' => 0	
 			],
 			'enfant' => [
 					'typeMenu' => 'text',
@@ -218,7 +230,10 @@ class init extends common {
 				'barRight' => '',
 				'displayMenu' =>  'none',
 				'hideMenuSide' => false,
-				'hideMenuChildren' =>false	
+				'hideMenuChildren' =>false,
+				'editing' => false,
+				'editing_csrf' => '',
+				'editing_time' => 0	
 			],
 			'privee' => [
 					'typeMenu' => 'text',
@@ -245,7 +260,10 @@ class init extends common {
 				'barRight' => '',
 				'displayMenu' =>  'none',
 				'hideMenuSide' => false,
-				'hideMenuChildren' =>false
+				'hideMenuChildren' =>false,
+				'editing' => false,
+				'editing_csrf' => '',
+				'editing_time' => 0	
 			],
 			'mise-en-page' => [
 				'typeMenu' => 'text',
@@ -271,7 +289,10 @@ class init extends common {
 				'barRight' => '',
 				'displayMenu' =>  'none',
 				'hideMenuSide' => false,
-				'hideMenuChildren' =>false
+				'hideMenuChildren' =>false,
+				'editing' => false,
+				'editing_csrf' => '',
+				'editing_time' => 0	
 			],
 			'menu-lateral' => [
 				'typeMenu' => 'text',
@@ -296,7 +317,10 @@ class init extends common {
 				'barRight' => 'barrelateraleavecmenu',
 				'displayMenu' =>  'none',
 				'hideMenuSide' => false,
-				'hideMenuChildren' =>false
+				'hideMenuChildren' =>false,
+				'editing' => false,
+				'editing_csrf' => '',
+				'editing_time' => 0	
 				],				
 			'blog' => [
 				'typeMenu' => 'text',
@@ -319,7 +343,10 @@ class init extends common {
 				'barRight' => '',
 				'displayMenu' =>  'none',
 				'hideMenuSide' => false,
-				'hideMenuChildren' =>false							
+				'hideMenuChildren' =>false,
+				'editing' => false,
+				'editing_csrf' => '',
+				'editing_time' => 0	
 			],
 			'galeries' => [
 				'typeMenu' => 'text',
@@ -342,7 +369,10 @@ class init extends common {
 				'barRight' => '',
 				'displayMenu' =>  'none',
 				'hideMenuSide' => false,
-				'hideMenuChildren' =>false			
+				'hideMenuChildren' =>false,
+				'editing' => false,
+				'editing_csrf' => '',
+				'editing_time' => 0	
 			],
 			'site-de-zwii' => [
 			'typeMenu' => 'text',
@@ -366,7 +396,10 @@ class init extends common {
 			'barRight' => '',
 			'displayMenu' => 'none',
 			'hideMenuSide' => false,
-			'hideMenuChildren' =>false							
+			'hideMenuChildren' =>false,
+			'editing' => false,
+			'editing_csrf' => '',
+			'editing_time' => 0	
 			],
 			'contact' => [
 				'typeMenu' => 'text',
@@ -389,7 +422,10 @@ class init extends common {
 				'barRight' => '',
 				'displayMenu' => 'none',
 				'hideMenuSide' => false,
-				'hideMenuChildren' =>false						
+				'hideMenuChildren' =>false,
+				'editing' => false,
+				'editing_csrf' => '',
+				'editing_time' => 0	
 			],
 			'barre' => [
 				'typeMenu' => 'text',
@@ -412,7 +448,10 @@ class init extends common {
 				'barRight' => '',
 				'displayMenu' => 'none',
 				'hideMenuSide' => false,
-				'hideMenuChildren' =>false	
+				'hideMenuChildren' =>false,
+				'editing' => false,
+				'editing_csrf' => '',
+				'editing_time' => 0	
 			],
 			'barrelateraleavecmenu' => [
 				'typeMenu' => 'text',
@@ -435,7 +474,10 @@ class init extends common {
 				'barRight' => '',
 				'displayMenu' => 'parents',
 				'hideMenuSide' => false,
-				'hideMenuChildren' =>false			
+				'hideMenuChildren' =>false,
+				'editing' => false,
+				'editing_csrf' => '',
+				'editing_time' => 0	
 			],
 			'mentions-legales' => [
 				'typeMenu' => 'text',
@@ -462,7 +504,10 @@ class init extends common {
 				'displayMenu' => 'none',
 				'hideMenuSide' => false,
 				'hideMenuHead' => false,
-				'hideMenuChildren' => false
+				'hideMenuChildren' => false,
+				'editing' => false,
+				'editing_csrf' => '',
+				'editing_time' => 0	
 			],
 			'mentions-legales' => [
 				'typeMenu' => 'text',
@@ -487,7 +532,10 @@ class init extends common {
 				'displayMenu' => 'none',
 				'hideMenuSide' => false,
 				'hideMenuHead' => false,
-				'hideMenuChildren' => false
+				'hideMenuChildren' => false,
+				'editing' => false,
+				'editing_csrf' => '',
+				'editing_time' => 0	
 			],
 		],
 		'module' => [

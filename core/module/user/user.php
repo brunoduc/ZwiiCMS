@@ -66,7 +66,10 @@ class user extends common {
 						'group' => $this->getInput('userAddGroup', helper::FILTER_INT, true),
 						'lastname' => $userLastname,
 						'mail' => $userMail,
-						'password' => $this->getInput('userAddPassword', helper::FILTER_PASSWORD, true)
+						'password' => $this->getInput('userAddPassword', helper::FILTER_PASSWORD, true),
+						'editing' => false,
+						'editing_time' => 0,
+						'editing_csrf' => ''
 					]
 				]);
 			}
@@ -220,7 +223,10 @@ class user extends common {
 						'group' => $newGroup,
 						'lastname' => $this->getInput('userEditLastname', helper::FILTER_STRING_SHORT, true),
 						'mail' => $this->getInput('userEditMail', helper::FILTER_MAIL, true),
-						'password' => $newPassword
+						'password' => $newPassword,
+						'editing' => false,
+						'editing_time' => 0,
+						'editing_csrf' => ''
 					]
 				]);
 				// Redirection spécifique si l'utilisateur change son mot de passe
@@ -242,11 +248,27 @@ class user extends common {
 					'state' => true
 				]);
 			}
-			// Valeurs en sortie
-			$this->addOutput([
-				'title' => $this->getData(['user', $this->getUrl(2), 'firstname']) . ' ' . $this->getData(['user', $this->getUrl(2), 'lastname']),
-				'view' => 'edit'
-			]);
+			$userIdent = $this->getUrl(2);
+			if($this->getData(['user', $userIdent,'editing']) === true
+				&& time() - $this->getData(['user', $userIdent,'editing_time']) < 120 ){
+				// Valeurs en sortie
+				$this->addOutput([
+					'redirect' => helper::baseUrl().'user',
+					'notification' => 'La configuration de ce membre est déjà en édition, accès impossible',
+					'state' => false
+				]);
+			
+			}
+			else{
+				$this->setData(['user', $userIdent, 'editing',true]);
+				$this->setData(['user', $userIdent, 'editing_time',time()]);
+				$this->setData(['user', $userIdent, 'editing_csrf', $_SESSION['csrf']]);
+				// Valeurs en sortie
+				$this->addOutput([
+					'title' => $this->getData(['user', $this->getUrl(2), 'firstname']) . ' ' . $this->getData(['user', $this->getUrl(2), 'lastname']),
+					'view' => 'edit'
+				]);
+			}
 		}
 	}
 

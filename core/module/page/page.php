@@ -89,7 +89,10 @@ class page extends common {
 				'displayMenu' => '0',
 				'hideMenuSide' => false,
 				'hideMenuHead' => false,
-				'hideMenuChildren' => false
+				'hideMenuChildren' => false,
+				'editing' => false,
+				'editing_csrf' => '',
+				'editing_time' => 0
 			]
 		]);
 		// Met à jour le site map
@@ -114,6 +117,15 @@ class page extends common {
 			$this->addOutput([
 				'access' => false
 			]);
+		}
+		// si la page est en édition et que la demande de delete provienne d'une autre session avec l'icône delete de la barre membre
+		elseif($this->getData(['page', $url[0],'editing']) === true && $this->getData(['page', $url[0],'editing_csrf']) != $_SESSION['csrf']){
+			// Valeurs en sortie
+			$this->addOutput([
+				'redirect' => helper::baseUrl() . $url[0],
+				'notification' => 'Impossible de supprimer cette page car elle est en édition dans une autre session'
+			]);
+		
 		}
 		// Impossible de supprimer la page d'accueil
 		elseif($url[0] === $this->getData(['config', 'homePageId'])) {
@@ -268,6 +280,9 @@ class page extends common {
 						'hideMenuSide' => $this->getinput('pageEditHideMenuSide', helper::FILTER_BOOLEAN),
 						'hideMenuHead' => $this->getinput('pageEditHideMenuHead', helper::FILTER_BOOLEAN),
 						'hideMenuChildren' => $this->getinput('pageEditHideMenuChildren', helper::FILTER_BOOLEAN),
+						'editing' => false,
+						'editing_csrf' => '',
+						'editing_time' => 0
 					]
 				]);				
 				// Barre renommée : changement le nom de la barre dans les pages mères
@@ -309,39 +324,58 @@ class page extends common {
 					]);
 				}
 			}
-			// Liste des modules
-			$moduleIds = [
-				'' => 'Aucun'
-			];
-			$iterator = new DirectoryIterator('module/');
-			foreach($iterator as $fileInfos) {
-				if(is_file($fileInfos->getPathname() . '/' . $fileInfos->getFilename() . '.php')) {
-					$moduleIds[$fileInfos->getBasename()] = ucfirst($fileInfos->getBasename());
+			else{
+				//La page est en cours d'édition et editing_time est voisin de time() (le navigateur n'est pas fermé !)
+				if($this->getData(['page', $this->getUrl(2),'editing']) === true
+					&& time() - $this->getData(['page', $this->getUrl(2),'editing_time']) < 120 ){
+					// Valeurs en sortie
+					$this->addOutput([
+						'redirect' => helper::baseUrl() . $pageId,
+						'notification' => 'La page est déjà en édition, accès impossible',
+						'state' => false
+					]);
+				
+				}
+				else{
+					//La page va être éditée mise à jour des valeurs editing de la page
+					$pageIdent = $this->getUrl(2);
+					$this->setData(['page', $pageIdent, 'editing',true]);
+					$this->setData(['page', $pageIdent, 'editing_time',time()]);
+					$this->setData(['page', $pageIdent, 'editing_csrf', $_SESSION['csrf']]);
+					// Liste des modules
+					$moduleIds = [
+						'' => 'Aucun'
+					];
+					$iterator = new DirectoryIterator('module/');
+					foreach($iterator as $fileInfos) {
+						if(is_file($fileInfos->getPathname() . '/' . $fileInfos->getFilename() . '.php')) {
+							$moduleIds[$fileInfos->getBasename()] = ucfirst($fileInfos->getBasename());
+						}
+					}
+					self::$moduleIds = $moduleIds;
+					// Pages sans parent
+					foreach($this->getHierarchy() as $parentPageId => $childrenPageIds) {
+						if($parentPageId !== $this->getUrl(2)) {
+							self::$pagesNoParentId[$parentPageId] = $this->getData(['page', $parentPageId, 'title']);
+						}
+					}	
+					// Pages barre latérales
+					foreach($this->getHierarchy(null,false,true) as $parentPageId => $childrenPageIds) {
+							if($parentPageId !== $this->getUrl(2) &&
+								$this->getData(['page', $parentPageId, 'block']) === 'bar') {
+								self::$pagesBarId[$parentPageId] = $this->getData(['page', $parentPageId, 'title']);
+							}
+					}			
+					// Valeurs en sortie
+					$this->addOutput([
+						'title' => $this->getData(['page', $this->getUrl(2), 'title']),
+						'vendor' => [
+							'tinymce'
+						],
+						'view' => 'edit'
+					]);
 				}
 			}
-			self::$moduleIds = $moduleIds;
-			// Pages sans parent
-			foreach($this->getHierarchy() as $parentPageId => $childrenPageIds) {
-				if($parentPageId !== $this->getUrl(2)) {
-					self::$pagesNoParentId[$parentPageId] = $this->getData(['page', $parentPageId, 'title']);
-				}
-			}	
-			// Pages barre latérales
-			foreach($this->getHierarchy(null,false,true) as $parentPageId => $childrenPageIds) {
-					if($parentPageId !== $this->getUrl(2) &&
-						$this->getData(['page', $parentPageId, 'block']) === 'bar') {
-						self::$pagesBarId[$parentPageId] = $this->getData(['page', $parentPageId, 'title']);
-					}
-			}			
-			// Valeurs en sortie
-			$this->addOutput([
-				'title' => $this->getData(['page', $this->getUrl(2), 'title']),
-				'vendor' => [
-					'tinymce'
-				],
-				'view' => 'edit'
-			]);
 		}
 	}
-
 }

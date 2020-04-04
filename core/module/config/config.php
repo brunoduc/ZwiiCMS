@@ -406,7 +406,10 @@ class config extends common {
 					'autoUpdate' => $this->getInput('configAutoUpdate', helper::FILTER_BOOLEAN),
 					'proxyType' => $this->getInput('configProxyType'),
 					'proxyUrl' => $this->getInput('configProxyUrl'),
-					'proxyPort' => $this->getInput('configProxyPort',helper::FILTER_INT)	
+					'proxyPort' => $this->getInput('configProxyPort',helper::FILTER_INT),
+					'editing' => false,
+					'editing_time' => 0,
+					'editing_csrf' => ''
 				]
 			]);
 							
@@ -459,15 +462,31 @@ class config extends common {
 				'state' => true
 			]);
 		}
-		// Initialisation du screen 
-		if (!file_exists(self::FILE_DIR.'source/screenshot.png')) {
-			$this->configMetaImage();
+		//Fin de traitement du formulaire, pause du verrou
+		if($this->getData(['config','editing']) === true
+			&& time() - $this->getData(['config', 'editing_time']) < 120 ){
+			// Valeurs en sortie
+			$this->addOutput([
+				'redirect' => helper::baseUrl(),
+				'notification' => 'La configuration du site est déjà en édition, accès impossible',
+				'state' => false
+			]);
+		
 		}
-		// Valeurs en sortie
-		$this->addOutput([
-			'title' => 'Configuration',
-			'view' => 'index'
-		]);
+		else{
+			$this->setData(['config', 'editing',true]);
+			$this->setData(['config', 'editing_time',time()]);
+			$this->setData(['config', 'editing_csrf', $_SESSION['csrf']]);
+			// Initialisation du screen 
+			if (!file_exists(self::FILE_DIR.'source/screenshot.png')) {
+				$this->configMetaImage();
+			}
+			// Valeurs en sortie
+			$this->addOutput([
+				'title' => 'Configuration',
+				'view' => 'index'
+			]);
+		}
 	}
 
 	/**

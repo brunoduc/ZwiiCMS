@@ -434,11 +434,26 @@ class theme extends common {
 	 * Accueil de la personnalisation
 	 */
 	public function index() {
-		// Valeurs en sortie
-		$this->addOutput([
-			'title' => 'Personnalisation du thème',
-			'view' => 'index'
-		]);
+		if($this->getData(['theme','editing']) === true
+			&& time() - $this->getData(['theme', 'editing_time']) < 120 ){
+			// Valeurs en sortie
+			$this->addOutput([
+				'redirect' => helper::baseUrl(),
+				'notification' => 'La personnalisation du thème est déjà en édition, accès impossible',
+				'state' => false
+			]);
+		
+		}
+		else{
+			$this->setData(['theme', 'editing',true]);
+			$this->setData(['theme', 'editing_time',time()]);
+			$this->setData(['theme', 'editing_csrf', $_SESSION['csrf']]);
+			// Valeurs en sortie
+			$this->addOutput([
+				'title' => 'Personnalisation du thème',
+				'view' => 'index'
+			]);
+		}
 	}
 
 	/**

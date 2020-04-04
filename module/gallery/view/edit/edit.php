@@ -45,6 +45,6 @@
 		</div>
 	</div>
 	<?php if($module::$pictures): ?>
-		<?php echo template::table([4, 1, 7], $module::$pictures, ['Image', 'Album','Légende']); ?>
+		<?php echo template::table([4, 1, 7], $module::$pictures, ['Image', 'Couverture','Légende']); ?>
 	<?php endif; ?>
 <?php echo template::formClose(); ?>

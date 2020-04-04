@@ -13,6 +13,24 @@
  */
 
 /**
+ * Tri dynamique de la galerie
+ */
+$( document ).ready(function() {
+	$("#galleryTable").tableDnD({		
+		onDrop: function(table, row) {
+			$("#galleryConfigFilterResponse").val($.tableDnD.serialize());
+		},
+		serializeRegexp:  "[^\_]*$"
+	});
+});
+
+// Activer le bouton de tri uniquement après un tri
+$("#galleryTable").mouseup(function(e) {
+	e.preventDefault();
+	$(":input[type='submit']").prop('disabled', false);
+});
+
+/**
  * Confirmation de suppression
  */
 $(".galleryConfigDelete").on("click", function() {
@@ -21,6 +39,8 @@ $(".galleryConfigDelete").on("click", function() {
 		$(location).attr("href", _this.attr("href"));
 	});
 });
+
+
 
 /**
  * Liste des dossiers
@@ -61,5 +81,4 @@ setInterval(function() {
 directoryDOM.on("change", function() {
 	directoryOldDOM.val($(this).val());
 });
-
 

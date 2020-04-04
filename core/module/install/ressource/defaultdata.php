@@ -545,7 +545,9 @@ class init extends common {
 				'beaux-paysages' => [
 					'config' => [
 						'name' => 'Beaux paysages',
-						'directory' => self::FILE_DIR.'source/galerie/landscape'
+						'directory' => self::FILE_DIR.'source/galerie/landscape',
+						'sort' => 'SORT_ASC',
+						'position' => 1
 					],
 					'legend' => [
 						'desertjpg' => 'Un désert',
@@ -556,7 +558,9 @@ class init extends common {
 				'espace' => [
 					'config' => [
 						'name' => 'Espace',
-						'directory' => self::FILE_DIR.'source/galerie/space'
+						'directory' => self::FILE_DIR.'source/galerie/space',
+						'sort' => 'SORT_ASC',
+						'position' => 2
 					],
 					'legend' => [
 						'earthjpg' => 'La Terre et la Lune',

@@ -5,7 +5,7 @@
 		<?php if($i % 2 === 1): ?>
 			<div class="row">
 		<?php endif; ?>		
-			<div class="col6" div="pos<?php echo $gallery['config']['order']; ?>" >
+			<div class="col6" div="pos<?php echo $gallery['config']['position']; ?>" >
 				<a
 					href="<?php echo helper::baseUrl() . $this->getUrl(0); ?>/<?php echo $galleryId; ?>"
 					class="galleryPicture"

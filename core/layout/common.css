@@ -950,6 +950,10 @@ footer #footerSocials .zwiico-github:hover {
 	width: 100vw;
 	max-width: 500px;
 	padding: 20px;
+		
+}
+.lightbox > span {
+	color: black;
 }
 .lightbox .lightboxButtons {
 	text-align: center;

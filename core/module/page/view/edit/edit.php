@@ -22,9 +22,7 @@ echo template::formOpen('pageEditForm');
 			]); ?>
 		</div>
 		<div class="col2">
-			<?php echo template::submit('pageEditSubmit',[
-				'name' => 'enregistrer'
-			]); ?>
+			<?php echo template::submit('pageEditSubmit'); ?>
 		</div>
 	</div>
 	<div class="row">

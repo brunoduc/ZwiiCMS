@@ -1424,13 +1424,15 @@ class core extends common {
 	}
 
 	/**
-     	 * Accès concurrents utilisé par router()
-     	 */	 
-	 public function acces_raz($pageId) {
-		if($this->getData(['page', $pageId, 'editing_csrf']) == $_SESSION['csrf'] && ($this->getUrl(1) === null || $this->getUrl(1) == 'logout' )){
-			$this->setData(['page', $pageId, 'editing', false]);
-			$this->setData(['page', $pageId, 'editing_time', 0]);
-			$this->setData(['page', $pageId, 'editing_csrf', '']);
+	 * Accès concurrents utilisé par router()
+	 */	 
+	 private function acces_raz($pageId) {
+		if(	$this->getData(['page', $pageId, 'editing_csrf']) === $_SESSION['csrf'] && 
+			($this->getUrl(1) === null || 
+			$this->getUrl(1) == 'logout' )){
+				$this->setData(['page', $pageId, 'editing', false]);
+				$this->setData(['page', $pageId, 'editing_time', 0]);
+				$this->setData(['page', $pageId, 'editing_csrf', '']);
 		}
 	 }
 	

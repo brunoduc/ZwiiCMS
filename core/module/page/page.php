@@ -343,16 +343,20 @@ class page extends common {
 					$this->setData(['page', $pageIdent, 'editing_time',time()]);
 					$this->setData(['page', $pageIdent, 'editing_csrf', $_SESSION['csrf']]);
 					// Liste des modules
-					$moduleIds = [
-						'' => 'Aucun'
-					];
+					$moduleIds = [];
 					$iterator = new DirectoryIterator('module/');
 					foreach($iterator as $fileInfos) {
 						if(is_file($fileInfos->getPathname() . '/' . $fileInfos->getFilename() . '.php')) {
-							$moduleIds[$fileInfos->getBasename()] = ucfirst($fileInfos->getBasename());
-						}
-					}
-					self::$moduleIds = $moduleIds;
+							if (array_key_exists($fileInfos->getBasename(),self::$moduleNames)) {
+								$moduleIds[$fileInfos->getBasename()] = self::$moduleNames[$fileInfos->getBasename()];
+							} else {
+								$moduleIds[$fileInfos->getBasename()] = ucfirst($fileInfos->getBasename());
+							}
+						}				
+					}			
+					self::$moduleIds = 	$moduleIds;
+					asort(self::$moduleIds);
+					self::$moduleIds = array_merge( ['' => 'Aucun'] , self::$moduleIds);
 					// Pages sans parent
 					foreach($this->getHierarchy() as $parentPageId => $childrenPageIds) {
 						if($parentPageId !== $this->getUrl(2)) {

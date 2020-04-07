@@ -25,9 +25,10 @@ $( document ).ready(function() {
 });
 
 // Activer le bouton de tri uniquement après un tri
-$("#galleryTable").mouseup(function(e) {
-	e.preventDefault();
-	$(":input[type='submit']").prop('disabled', false);
+$("#galleryTable").click(function() {
+	if ($("#galleryConfigFilterResponse").val() != "") {
+		$(":input[type='submit']").prop('disabled', false);
+	}
 });
 
 /**

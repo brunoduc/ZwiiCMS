@@ -9,13 +9,7 @@
 				<a
 					href="<?php echo helper::baseUrl() . $this->getUrl(0); ?>/<?php echo $galleryId; ?>"
 					class="galleryPicture"
-					style="background-image:url('<?php 					
-					if ($this->getData(['module', $this->getUrl(0), $galleryId, 'config', 'homePicture']) === null ) {
-						echo helper::baseUrl(false) . $module::$firstPictures[$galleryId];						
-					} else {
-						echo helper::baseUrl(false) . $this->getData(['module', $this->getUrl(0), $galleryId, 'config', 'directory']) . '/' . $this->getData(['module', $this->getUrl(0), $galleryId, 'config', 'homePicture']); 
-					}					
-					?>')"
+					style="background-image:url('<?php echo $module::$firstPictures[$galleryId];?>')"
 				>
 					<div class="galleryName"><?php echo $gallery['config']['name']; ?></div>
 				</a>

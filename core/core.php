@@ -32,8 +32,12 @@ class common {
 	const FILE_DIR = 'site/file/';
 	const TEMP_DIR = 'site/tmp/';
 
+	// Miniatures de la gallery
+	const THUMBS_SEPARATOR = 'mini_';
+	const THUMBS_WIDTH = 320;
+
 	// Numéro de version 
-	const ZWII_VERSION = '10.0.049';
+	const ZWII_VERSION = '10.0.058';
 	const ZWII_UPDATE_CHANNEL = "v10";
 
 	public static $actions = [];
@@ -781,9 +785,51 @@ class common {
 
 	}
 	
+	/*
+	* Création d'une miniature
+	* Fonction utilisée lors de la mise à jour d'une version 9 à une version 10
+	* @param string $src image source
+	* @param string $dets image destination
+	* @param integer $desired_width largeur demandée
+	*/
+
+	function makeThumb($src, $dest, $desired_width) {
 
 
-		/**
+		if (mime_content_type($src) === 'image/jpeg' ) {
+			if ($source_image =  imagecreatefromjpeg($src)) {
+				$width = imagesx($source_image);
+				$height = imagesy($source_image);		
+				/* find the "desired height" of this thumbnail, relative to the desired width  */
+				$desired_height = floor($height * ($desired_width / $width));		
+				/* create a new, "virtual" image */
+				$virtual_image = imagecreatetruecolor($desired_width, $desired_height);		
+				/* copy source image at a resized size */
+				imagecopyresampled($virtual_image, $source_image, 0, 0, 0, 0, $desired_width, $desired_height, $width, $height);		
+				/* create the physical thumbnail image to its destination */
+				return (imagejpeg($virtual_image, $dest));
+				
+			}
+		}
+		if ( mime_content_type($src) === 'image/png' )  {
+			/* read the source image */
+			if ($source_image = imagecreatefrompng($src)) {;
+				$width = imagesx($source_image);
+				$height = imagesy($source_image);		
+				/* find the "desired height" of this thumbnail, relative to the desired width  */
+				$desired_height = floor($height * ($desired_width / $width));		
+				/* create a new, "virtual" image */
+				$virtual_image = imagecreatetruecolor($desired_width, $desired_height);		
+				/* copy source image at a resized size */
+				imagecopyresampled($virtual_image, $source_image, 0, 0, 0, 0, $desired_width, $desired_height, $width, $height);		
+				/* create the physical thumbnail image to its destination */
+				return (imagepng($virtual_image, $dest));
+			}
+		}
+	}
+
+
+	/**
 	 * Envoi un mail
 	 * @param string|array $to Destinataire
 	 * @param string $subject Sujet
@@ -1116,7 +1162,9 @@ class common {
 		// Version 10.0.00
 		if($this->getData(['core', 'dataVersion']) < 10000) {
 			$this->setData(['config', 'faviconDark','faviconDark.ico']);
-			// Numérotation des galeries
+
+			//----------------------------------------
+			// Mettre à jour les données des galeries
 			$pageList = array();
 			foreach ($this->getHierarchy(null,null,null) as $parentKey=>$parentValue) {
 				$pageList [] = $parentKey;
@@ -1138,12 +1186,35 @@ class common {
 						if ( $this->getdata(['module',$parent,$galleryKey,'config','position']) === NULL) {
 							$this->setdata(['module',$parent,$galleryKey,'config','position',$i++]);
 						}						
-					}					
+						// Image de couverture
+						if ( $this->getdata(['module',$parent,$galleryKey,'config','homePicture']) === NULL)  {
+							$iterator = new DirectoryIterator($this->getdata(['module',$parent,$galleryKey,'config','directory']));
+							foreach($iterator as $fileInfos) {
+								if($fileInfos->isDot() === false AND $fileInfos->isFile() AND @getimagesize($fileInfos->getPathname())) {									
+									$this->setdata(['module',$parent,$galleryKey,'config','homePicture',$fileInfos->getFilename()]);
+									break;
+
+								}
+							}
+						}	
+					}			
 				}
 			}	
+			//----------------------------------------
+			// Mise à jour de la taille des miniatures
+			/*
+			$iterator = new RecursiveDirectoryIterator('site/file/source/');
+			foreach(new RecursiveIteratorIterator($iterator) as $fileInfos) {
+				if($fileInfos->isFile() AND @getimagesize($fileInfos->getPathname())) {									
+					if (!file_exists( str_replace('source','thumb',$fileInfos->getPathname()) . '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()))) {
+						$this->makeThumb($fileInfos->getPathname(),
+										str_replace('source','thumb',$fileInfos->getPath()) .  '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()),
+										self::THUMBS_WIDTH);
+					}
+				}
+			}*/
 			$this->setData(['core', 'dataVersion', 10000]);	
-		}	
-
+		}
 	}
 }
 
@@ -2375,8 +2446,8 @@ class layout extends common {
 					OR $this->getUrl(0) === ''
 				) {
 					$leftItems .= '<li><a href="' . helper::baseUrl() . 'page/edit/' . $this->getUrl(0) . '" data-tippy-content="Modifier la page">' . template::ico('pencil') . '</a></li>';
-					if ($this->getData(['page', $this->getUrl(),'moduleId'])) {
-						$leftItems .= '<li><a href="' . helper::baseUrl() . $this->getUrl() . '/config' . '" data-tippy-content="Configurer le module">' . template::ico('gear') . '</a></li>';					
+					if ($this->getData(['page', $this->getUrl(0),'moduleId'])) {
+						$leftItems .= '<li><a href="' . helper::baseUrl() . $this->getUrl(0) . '/config' . '" data-tippy-content="Configurer le module">' . template::ico('gear') . '</a></li>';					
 					}
 					$leftItems .= '<li><a id="pageDelete" href="' . helper::baseUrl() . 'page/delete/' . $this->getUrl(0) . '&csrf=' . $_SESSION['csrf'] . '" data-tippy-content="Effacer la page">' . template::ico('trash') . '</a></li>';					
 				}

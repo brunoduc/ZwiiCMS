@@ -18,7 +18,7 @@
 			<a
 				href="<?php echo helper::baseUrl(false) . $picture; ?>"
 				class="galleryGalleryPicture"
-				style="background-image:url('<?php echo helper::baseUrl(false) . $picture; ?>')"
+				style="background-image:url('<?php echo helper::baseUrl(false) . $module::$thumbs[$picture]; ?>')"
 				data-caption="<?php echo $legend; ?>"
 			>
 				<?php if($legend): ?>

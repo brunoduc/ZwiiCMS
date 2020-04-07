@@ -28,7 +28,14 @@ class page extends common {
 		'' => 'Aucune'
 	];	
 	public static $moduleIds = [];
-
+	// Nom des modules
+	public static $moduleNames = [
+		'news'			=> 'Nouvelles',
+		'blog' 			=> 'Blog',
+		'form' 			=> 'Formulaire',
+		'gallery' 		=> 'Galerie',
+		'redirection' 	=> 'Redirection'
+	];
 	public static $typeMenu = [
 		'text' => 'Texte',
 		'icon' => 'Icône',

@@ -260,38 +260,42 @@ class page extends common {
 					$hideTitle = true;
 				}
 				// Modifie la page ou en crée une nouvelle si l'id a changé
-				$this->setData([
-					'page',
-					$pageId,
-					[					
-						'typeMenu' => $this->getinput('pageTypeMenu'),
-						'iconUrl' => $this->getinput('pageIconUrl'),
-						'disable'=> $this->getinput('pageEditDisable', helper::FILTER_BOOLEAN), 						
-						'content' => (empty($this->getInput('pageEditContent', null)) ? '<p>&nbsp;</p>' : $this->getInput('pageEditContent', null)),
-						'hideTitle' => $hideTitle,
-						'breadCrumb' => $this->getInput('pageEditbreadCrumb', helper::FILTER_BOOLEAN),
-						'metaDescription' => $this->getInput('pageEditMetaDescription', helper::FILTER_STRING_LONG),
-						'metaTitle' => $this->getInput('pageEditMetaTitle'),
-						'moduleId' => $this->getInput('pageEditModuleId'),
-						'modulePosition' => $this->getInput('configModulePosition'),
-						'parentPageId' => $this->getInput('pageEditParentPageId'),
-						'position' => $position,
-						'group' => $this->getinput('pageEditBlock') !== 'bar' ? $this->getInput('pageEditGroup', helper::FILTER_INT) : 0,
-						'targetBlank' => $this->getInput('pageEditTargetBlank', helper::FILTER_BOOLEAN),
-						'targetLity' => $this->getInput('pageEditTargetBlank', helper::FILTER_BOOLEAN) === true ? false : $this->getInput('pageEditTargetLity', helper::FILTER_BOOLEAN),						
-						'title' => $this->getInput('pageEditTitle', helper::FILTER_STRING_SHORT),
-						'block' => $this->getinput('pageEditBlock'),
-						'barLeft' => $barLeft,
-						'barRight' => $barRight,
-						'displayMenu' => $this->getinput('pageEditDisplayMenu'),
-						'hideMenuSide' => $this->getinput('pageEditHideMenuSide', helper::FILTER_BOOLEAN),
-						'hideMenuHead' => $this->getinput('pageEditHideMenuHead', helper::FILTER_BOOLEAN),
-						'hideMenuChildren' => $this->getinput('pageEditHideMenuChildren', helper::FILTER_BOOLEAN),
-						'editing' => false,
-						'editing_csrf' => '',
-						'editing_time' => 0
-					]
-				]);				
+				// Si le submit provient du bouton enregistrer
+				if(isset($_POST['pageEditSubmit'])){
+					$this->setData([
+						'page',
+						$pageId,
+						[
+							'typeMenu' => $this->getinput('pageTypeMenu'),
+							'iconUrl' => $this->getinput('pageIconUrl'),
+							'disable'=> $this->getinput('pageEditDisable', helper::FILTER_BOOLEAN), 						
+							'content' => (empty($this->getInput('pageEditContent', null)) ? '<p>&nbsp;</p>' : $this->getInput('pageEditContent', null)),
+							'hideTitle' => $hideTitle,
+							'breadCrumb' => $this->getInput('pageEditbreadCrumb', helper::FILTER_BOOLEAN),
+							'metaDescription' => $this->getInput('pageEditMetaDescription', helper::FILTER_STRING_LONG),
+							'metaTitle' => $this->getInput('pageEditMetaTitle'),
+							'moduleId' => $this->getInput('pageEditModuleId'),
+							'modulePosition' => $this->getInput('configModulePosition'),
+							'parentPageId' => $this->getInput('pageEditParentPageId'),
+							'position' => $position,
+							'group' => $this->getinput('pageEditBlock') !== 'bar' ? $this->getInput('pageEditGroup', helper::FILTER_INT) : 0,
+							'targetBlank' => $this->getInput('pageEditTargetBlank', helper::FILTER_BOOLEAN),
+							'targetLity' => $this->getInput('pageEditTargetBlank', helper::FILTER_BOOLEAN) === true ? false : $this->getInput('pageEditTargetLity', helper::FILTER_BOOLEAN),						
+							'title' => $this->getInput('pageEditTitle', helper::FILTER_STRING_SHORT),
+							'block' => $this->getinput('pageEditBlock'),
+							'barLeft' => $barLeft,
+							'barRight' => $barRight,
+							'displayMenu' => $this->getinput('pageEditDisplayMenu'),
+							'hideMenuSide' => $this->getinput('pageEditHideMenuSide', helper::FILTER_BOOLEAN),
+							'hideMenuHead' => $this->getinput('pageEditHideMenuHead', helper::FILTER_BOOLEAN),
+							'hideMenuChildren' => $this->getinput('pageEditHideMenuChildren', helper::FILTER_BOOLEAN),
+							'editing' => false,
+							'editing_csrf' => '',
+							'editing_time' => 0
+						]
+					]);
+				}					
+				
 				// Barre renommée : changement le nom de la barre dans les pages mères
 				if ($this->getinput('pageEditBlock') === 'bar') {
 					foreach ($this->getHierarchy() as $eachPageId=>$parentId) {

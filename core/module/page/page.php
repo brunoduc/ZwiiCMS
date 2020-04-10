@@ -338,7 +338,8 @@ class page extends common {
 			else{
 				//La page est en cours d'édition et editing_time est voisin de time() (le navigateur n'est pas fermé !)
 				if($this->getData(['page', $this->getUrl(2),'editing']) === true
-					&& time() - $this->getData(['page', $this->getUrl(2),'editing_time']) < 120 ){
+					&& time() - $this->getData(['page', $this->getUrl(2),'editing_time']) < 120
+				  	&& $this->getData(['page', $this->getUrl(2),'editing_csrf']) != $_SESSION['csrf']){
 					// Valeurs en sortie
 					$this->addOutput([
 						'redirect' => helper::baseUrl() . $pageId,

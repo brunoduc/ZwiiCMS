@@ -260,41 +260,57 @@ class page extends common {
 					$hideTitle = true;
 				}
 				// Modifie la page ou en crée une nouvelle si l'id a changé
-				// Si le submit provient du bouton enregistrer
+				// Si le submit provient du bouton Enregistrer on libère le verrou
 				if(isset($_POST['pageEditSubmit'])){
-					$this->setData([
-						'page',
-						$pageId,
-						[
-							'typeMenu' => $this->getinput('pageTypeMenu'),
-							'iconUrl' => $this->getinput('pageIconUrl'),
-							'disable'=> $this->getinput('pageEditDisable', helper::FILTER_BOOLEAN), 						
-							'content' => (empty($this->getInput('pageEditContent', null)) ? '<p>&nbsp;</p>' : $this->getInput('pageEditContent', null)),
-							'hideTitle' => $hideTitle,
-							'breadCrumb' => $this->getInput('pageEditbreadCrumb', helper::FILTER_BOOLEAN),
-							'metaDescription' => $this->getInput('pageEditMetaDescription', helper::FILTER_STRING_LONG),
-							'metaTitle' => $this->getInput('pageEditMetaTitle'),
-							'moduleId' => $this->getInput('pageEditModuleId'),
-							'modulePosition' => $this->getInput('configModulePosition'),
-							'parentPageId' => $this->getInput('pageEditParentPageId'),
-							'position' => $position,
-							'group' => $this->getinput('pageEditBlock') !== 'bar' ? $this->getInput('pageEditGroup', helper::FILTER_INT) : 0,
-							'targetBlank' => $this->getInput('pageEditTargetBlank', helper::FILTER_BOOLEAN),
-							'targetLity' => $this->getInput('pageEditTargetBlank', helper::FILTER_BOOLEAN) === true ? false : $this->getInput('pageEditTargetLity', helper::FILTER_BOOLEAN),						
-							'title' => $this->getInput('pageEditTitle', helper::FILTER_STRING_SHORT),
-							'block' => $this->getinput('pageEditBlock'),
-							'barLeft' => $barLeft,
-							'barRight' => $barRight,
-							'displayMenu' => $this->getinput('pageEditDisplayMenu'),
-							'hideMenuSide' => $this->getinput('pageEditHideMenuSide', helper::FILTER_BOOLEAN),
-							'hideMenuHead' => $this->getinput('pageEditHideMenuHead', helper::FILTER_BOOLEAN),
-							'hideMenuChildren' => $this->getinput('pageEditHideMenuChildren', helper::FILTER_BOOLEAN),
-							'editing' => false,
-							'editing_csrf' => '',
-							'editing_time' => 0
-						]
-					]);
-				}					
+					$val_editing = false;
+					$val_editing_csrf = '';
+					$val_editing_time = 0;
+				}
+				else{
+					//Si la page n'existe pas on initialise sinon on conserve les paramètres
+					if(null === $this->getData(['page', $pageId])){
+						$val_editing = true;
+						$val_editing_csrf = $_SESSION['csrf'];
+						$val_editing_time = time();
+					}
+					else{
+						$val_editing = $this->getData(['page', $pageId , 'editing']);
+						$val_editing_csrf = $this->getData(['page', $pageId , 'editing_csrf']);
+						$val_editing_time = $this->getData(['page', $pageId , 'editing_time']);
+					}
+				}	
+				$this->setData([
+					'page',
+					$pageId,
+					[
+						'typeMenu' => $this->getinput('pageTypeMenu'),
+						'iconUrl' => $this->getinput('pageIconUrl'),
+						'disable'=> $this->getinput('pageEditDisable', helper::FILTER_BOOLEAN), 						
+						'content' => (empty($this->getInput('pageEditContent', null)) ? '<p>&nbsp;</p>' : $this->getInput('pageEditContent', null)),
+						'hideTitle' => $hideTitle,
+						'breadCrumb' => $this->getInput('pageEditbreadCrumb', helper::FILTER_BOOLEAN),
+						'metaDescription' => $this->getInput('pageEditMetaDescription', helper::FILTER_STRING_LONG),
+						'metaTitle' => $this->getInput('pageEditMetaTitle'),
+						'moduleId' => $this->getInput('pageEditModuleId'),
+						'modulePosition' => $this->getInput('configModulePosition'),
+						'parentPageId' => $this->getInput('pageEditParentPageId'),
+						'position' => $position,
+						'group' => $this->getinput('pageEditBlock') !== 'bar' ? $this->getInput('pageEditGroup', helper::FILTER_INT) : 0,
+						'targetBlank' => $this->getInput('pageEditTargetBlank', helper::FILTER_BOOLEAN),
+						'targetLity' => $this->getInput('pageEditTargetBlank', helper::FILTER_BOOLEAN) === true ? false : $this->getInput('pageEditTargetLity', helper::FILTER_BOOLEAN),						
+						'title' => $this->getInput('pageEditTitle', helper::FILTER_STRING_SHORT),
+						'block' => $this->getinput('pageEditBlock'),
+						'barLeft' => $barLeft,
+						'barRight' => $barRight,
+						'displayMenu' => $this->getinput('pageEditDisplayMenu'),
+						'hideMenuSide' => $this->getinput('pageEditHideMenuSide', helper::FILTER_BOOLEAN),
+						'hideMenuHead' => $this->getinput('pageEditHideMenuHead', helper::FILTER_BOOLEAN),
+						'hideMenuChildren' => $this->getinput('pageEditHideMenuChildren', helper::FILTER_BOOLEAN),
+						'editing' => $val_editing,
+						'editing_csrf' => $val_editing_csrf,
+						'editing_time' => $val_editing_time
+					]
+				]);					
 				
 				// Barre renommée : changement le nom de la barre dans les pages mères
 				if ($this->getinput('pageEditBlock') === 'bar') {

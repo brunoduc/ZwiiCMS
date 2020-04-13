@@ -79,7 +79,7 @@
 							<div class="col4 offset8">
 								<?php echo template::button('themeSiteSubmitButtonPreview', [
 									'class' => 'buttonSubmitPreview',						
-									'value' => 'Valider'
+									'value' => 'Bouton'
 								]); ?>
 							</div>
 						</div>

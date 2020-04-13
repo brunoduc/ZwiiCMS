@@ -28,7 +28,14 @@ class page extends common {
 		'' => 'Aucune'
 	];	
 	public static $moduleIds = [];
-
+	// Nom des modules
+	public static $moduleNames = [
+		'news'			=> 'Nouvelles',
+		'blog' 			=> 'Blog',
+		'form' 			=> 'Formulaire',
+		'gallery' 		=> 'Galerie',
+		'redirection' 	=> 'Redirection'
+	];
 	public static $typeMenu = [
 		'text' => 'Texte',
 		'icon' => 'Icône',
@@ -81,7 +88,6 @@ class page extends common {
 				'position' => 0,
 				'group' => self::GROUP_VISITOR,
 				'targetBlank' => false,
-				'targetLity' => false,
 				'title' => $pageTitle,
 				'block' => '12',
 				'barLeft' => '',
@@ -269,7 +275,6 @@ class page extends common {
 						'position' => $position,
 						'group' => $this->getinput('pageEditBlock') !== 'bar' ? $this->getInput('pageEditGroup', helper::FILTER_INT) : 0,
 						'targetBlank' => $this->getInput('pageEditTargetBlank', helper::FILTER_BOOLEAN),
-						'targetLity' => $this->getInput('pageEditTargetBlank', helper::FILTER_BOOLEAN) === true ? false : $this->getInput('pageEditTargetLity', helper::FILTER_BOOLEAN),						
 						'title' => $this->getInput('pageEditTitle', helper::FILTER_STRING_SHORT),
 						'block' => $this->getinput('pageEditBlock'),
 						'barLeft' => $barLeft,
@@ -323,16 +328,20 @@ class page extends common {
 				}
 			}
 			// Liste des modules
-			$moduleIds = [
-				'' => 'Aucun'
-			];
+			$moduleIds = [];
 			$iterator = new DirectoryIterator('module/');
 			foreach($iterator as $fileInfos) {
 				if(is_file($fileInfos->getPathname() . '/' . $fileInfos->getFilename() . '.php')) {
-					$moduleIds[$fileInfos->getBasename()] = ucfirst($fileInfos->getBasename());
-				}
-			}
-			self::$moduleIds = $moduleIds;
+					if (array_key_exists($fileInfos->getBasename(),self::$moduleNames)) {
+						$moduleIds[$fileInfos->getBasename()] = self::$moduleNames[$fileInfos->getBasename()];
+					} else {
+						$moduleIds[$fileInfos->getBasename()] = ucfirst($fileInfos->getBasename());
+					}
+				}				
+			}			
+			self::$moduleIds = 	$moduleIds;
+			asort(self::$moduleIds);
+			self::$moduleIds = array_merge( ['' => 'Aucun'] , self::$moduleIds);
 			// Pages sans parent
 			foreach($this->getHierarchy() as $parentPageId => $childrenPageIds) {
 				if($parentPageId !== $this->getUrl(2)) {

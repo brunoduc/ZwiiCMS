@@ -54,7 +54,7 @@
 						'label' => 'Groupe',
 						'selected' => $this->getData(['user', $this->getUrl(2), 'group'])
 					]); ?>
-					Autorisations :
+					 <div id="userEditLabelAuth">Autorisations :</div>
 					<ul id="userEditGroupDescription<?php echo self::GROUP_MEMBER; ?>" class="userEditGroupDescription displayNone">
 						<li>Accès aux pages privées membres</li>
 					</ul>

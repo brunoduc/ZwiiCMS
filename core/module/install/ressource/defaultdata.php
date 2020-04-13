@@ -462,7 +462,6 @@ class init extends common {
 				'position' => 0,
 				'group' => 0,
 				'targetBlank' => false,
-				'targetLity' => false,
 				'title' => 'Mentions légales',
 				'block' => '12',
 				'barLeft' => '',
@@ -487,7 +486,6 @@ class init extends common {
 				'position' => 0,
 				'group' => 0,
 				'targetBlank' => false,
-				'targetLity' => false,
 				'title' => 'Mentions légales',
 				'block' => '12',
 				'barLeft' => '',
@@ -546,6 +544,7 @@ class init extends common {
 					'config' => [
 						'name' => 'Beaux paysages',
 						'directory' => self::FILE_DIR.'source/galerie/landscape',
+						'homePicture' => 'iceberg.jpg',
 						'sort' => 'SORT_ASC',
 						'position' => 1
 					],
@@ -553,12 +552,18 @@ class init extends common {
 						'desertjpg' => 'Un désert',
 						'icebergjpg' => 'Un iceberg',
 						'meadowjpg' => 'Une prairie'
+					],
+					'position' => [
+						'desertjpg' => 3,
+						'icebergjpg' => 1,
+						'meadowjpg' => 2
 					]
 				],
 				'espace' => [
 					'config' => [
 						'name' => 'Espace',
 						'directory' => self::FILE_DIR.'source/galerie/space',
+						'homePicture' => 'nebula.jpg',
 						'sort' => 'SORT_ASC',
 						'position' => 2
 					],
@@ -566,6 +571,11 @@ class init extends common {
 						'earthjpg' => 'La Terre et la Lune',
 						'cosmosjpg' => 'Le cosmos',
 						'nebulajpg' => 'Une nébuleuse'
+					],
+					'position' => [
+						'earthjpg' => 1,
+						'cosmosjpg' => 3,
+						'nebulajpg' => 2
 					]
 				]
 			],

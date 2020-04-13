@@ -12,35 +12,39 @@
  * @link http://zwiicms.com/
  */
 
-/**
- * Tri dynamique de la galerie
- */
 $( document ).ready(function() {
-	$("#galleryTable").tableDnD({		
-		onDrop: function(table, row) {
+
+
+	/**
+	 * Tri de la galerie avec drag and drop
+	 */	
+	$("#galleryTable").tableDnD({	
+		onDrop: function(table, row) {			
 			$("#galleryConfigFilterResponse").val($.tableDnD.serialize());
 		},
+		onDragStop : function(table, row) {
+			// Affiche le bouton de tri après un déplacement
+			$(":input[type='submit']").prop('disabled', false);
+			// Sauvegarde le tri
+			sort();
+		},
+		// Supprime le tiret des séparateurs
 		serializeRegexp:  "[^\_]*$"
 	});
-});
+	
 
-// Activer le bouton de tri uniquement après un tri
-$("#galleryTable").mouseup(function(e) {
-	e.preventDefault();
-	$(":input[type='submit']").prop('disabled', false);
-});
 
-/**
- * Confirmation de suppression
- */
-$(".galleryConfigDelete").on("click", function() {
-	var _this = $(this);
-	return core.confirm("Êtes-vous sûr de vouloir supprimer cette galerie ?", function() {
-		$(location).attr("href", _this.attr("href"));
+	/**
+	 * Confirmation de suppression
+	 */
+	$(".galleryConfigDelete").on("click", function() {
+		var _this = $(this);
+		return core.confirm("Êtes-vous sûr de vouloir supprimer cette galerie ?", function() {
+			$(location).attr("href", _this.attr("href"));
+		});
 	});
+
 });
-
-
 
 /**
  * Liste des dossiers
@@ -82,3 +86,19 @@ directoryDOM.on("change", function() {
 	directoryOldDOM.val($(this).val());
 });
 
+
+/**
+ * Tri dynamique des galeries
+ */
+
+function sort() {
+	var url = "<?php echo helper::baseUrl() . $this->getUrl(0) . '/sort'; ?>";
+	var data = $("#galleryConfigFilterResponse").val();			
+	$.ajax({
+		type: "POST",
+		url: url ,
+		data: {
+			response : data
+		}
+	});
+}

@@ -20,7 +20,6 @@ class common {
 	const DISPLAY_LAYOUT_BLANK = 2;
 	const DISPLAY_LAYOUT_MAIN = 3;
 	const DISPLAY_LAYOUT_LIGHT = 4;
-	const DISPLAY_LAYOUT_POPUP = 5;
 	const GROUP_BANNED = -1;
 	const GROUP_VISITOR = 0;
 	const GROUP_MEMBER = 1;
@@ -37,7 +36,7 @@ class common {
 	const THUMBS_WIDTH = 320;
 
 	// Numéro de version 
-	const ZWII_VERSION = '10.0.059';
+	const ZWII_VERSION = '10.0.064';
 	const ZWII_UPDATE_CHANNEL = "v10";
 
 	public static $actions = [];
@@ -84,7 +83,6 @@ class common {
 		'notification' => '',
 		'redirect' => '',
 		'script' => '',
-		'targetLity' => false,
 		'showBarEditButton' => false,
 		'showPageContent' => false,
 		'state' => false,
@@ -792,39 +790,49 @@ class common {
 	* @param string $dets image destination
 	* @param integer $desired_width largeur demandée
 	*/
-
 	function makeThumb($src, $dest, $desired_width) {
-
-
-		if (mime_content_type($src) === 'image/jpeg' ) {
-			if ($source_image =  imagecreatefromjpeg($src)) {
-				$width = imagesx($source_image);
-				$height = imagesy($source_image);		
-				/* find the "desired height" of this thumbnail, relative to the desired width  */
-				$desired_height = floor($height * ($desired_width / $width));		
-				/* create a new, "virtual" image */
-				$virtual_image = imagecreatetruecolor($desired_width, $desired_height);		
-				/* copy source image at a resized size */
-				imagecopyresampled($virtual_image, $source_image, 0, 0, 0, 0, $desired_width, $desired_height, $width, $height);		
-				/* create the physical thumbnail image to its destination */
-				return (imagejpeg($virtual_image, $dest));
-				
-			}
+		// Vérifier l'existence du dossier de destination.
+		$path = pathinfo($dest);
+		if (!is_dir($path['dirname'])) {
+			mkdir($path['dirname'],755,true);
 		}
-		if ( mime_content_type($src) === 'image/png' )  {
-			/* read the source image */
-			if ($source_image = imagecreatefrompng($src)) {;
-				$width = imagesx($source_image);
-				$height = imagesy($source_image);		
-				/* find the "desired height" of this thumbnail, relative to the desired width  */
-				$desired_height = floor($height * ($desired_width / $width));		
-				/* create a new, "virtual" image */
-				$virtual_image = imagecreatetruecolor($desired_width, $desired_height);		
-				/* copy source image at a resized size */
-				imagecopyresampled($virtual_image, $source_image, 0, 0, 0, 0, $desired_width, $desired_height, $width, $height);		
-				/* create the physical thumbnail image to its destination */
-				return (imagepng($virtual_image, $dest));
-			}
+		// Type d'image
+		switch(mime_content_type($src) ) {
+			case 'image/jpeg':
+			case 'image/jpg':
+				$source_image = imagecreatefromjpeg($src);
+				break;
+			case 'image/png':
+				$source_image = imagecreatefrompng($src);
+				break;
+			case 'image/gif':
+				$source_image = imagecreatefromgif($src);
+				break;
+		}
+		// Image valide
+		if ($source_image) {
+			$width = imagesx($source_image);
+			$height = imagesy($source_image);		
+			/* find the "desired height" of this thumbnail, relative to the desired width  */
+			$desired_height = floor($height * ($desired_width / $width));		
+			/* create a new, "virtual" image */
+			$virtual_image = imagecreatetruecolor($desired_width, $desired_height);		
+			/* copy source image at a resized size */
+			imagecopyresampled($virtual_image, $source_image, 0, 0, 0, 0, $desired_width, $desired_height, $width, $height);		
+			switch(mime_content_type($src) ) {
+				case 'image/jpeg':
+				case 'image/jpg':
+					return (imagejpeg($virtual_image, $dest));
+					break;
+				case 'image/png':
+					return (imagepng($virtual_image, $dest));
+					break;
+				case 'image/gif':
+					return (imagegif($virtual_image, $dest));
+					break;
+			}			
+		} else {
+			return (false);
 		}
 	}
 
@@ -1172,7 +1180,7 @@ class common {
 					$pageList [] = $childKey;
 				}
 			}	
-			// Parcourir toutes les pages
+			// Mise à jour des données pour la galerie v2
 			foreach ($pageList as $parentKey => $parent) {
 				//La page a une galerie
 				if ($this->getData(['page',$parent,'moduleId']) === 'gallery' ) {
@@ -1180,12 +1188,19 @@ class common {
 					$tempData =  $this->getData(['module', $parent]);	
 					$i = 1;
 					foreach ($tempData as $galleryKey => $galleryItem) {
+						// Ordre de tri des galeries
 						if ( $this->getdata(['module',$parent,$galleryKey,'config','sort']) === NULL)  {
 							$this->setdata(['module',$parent,$galleryKey,'config','sort','SORT_ASC']);
 						}
+						// Position de la galerie, tri manuel
 						if ( $this->getdata(['module',$parent,$galleryKey,'config','position']) === NULL) {
 							$this->setdata(['module',$parent,$galleryKey,'config','position',$i++]);
 						}						
+						// Positions des images, tri manuel
+						if ( $this->getdata(['module',$parent,$galleryKey,'position']) === NULL) {
+							$c = count($this->getdata(['module',$parent,$galleryKey,'legend']));
+							$this->setdata(['module',$parent,$galleryKey,'position', range(0,$c-1) ]);
+						}
 						// Image de couverture
 						if ( $this->getdata(['module',$parent,$galleryKey,'config','homePicture']) === NULL)  {
 							$iterator = new DirectoryIterator($this->getdata(['module',$parent,$galleryKey,'config','directory']));
@@ -1199,20 +1214,7 @@ class common {
 						}	
 					}			
 				}
-			}	
-			//----------------------------------------
-			// Mise à jour de la taille des miniatures
-			/*
-			$iterator = new RecursiveDirectoryIterator('site/file/source/');
-			foreach(new RecursiveIteratorIterator($iterator) as $fileInfos) {
-				if($fileInfos->isFile() AND @getimagesize($fileInfos->getPathname())) {									
-					if (!file_exists( str_replace('source','thumb',$fileInfos->getPathname()) . '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()))) {
-						$this->makeThumb($fileInfos->getPathname(),
-										str_replace('source','thumb',$fileInfos->getPath()) .  '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()),
-										self::THUMBS_WIDTH);
-					}
-				}
-			}*/
+			}				
 			$this->setData(['core', 'dataVersion', 10000]);	
 		}
 	}
@@ -1591,7 +1593,6 @@ class core extends common {
 				'disable' => $this->getData(['page', $this->getUrl(0), 'disable']),
 				'contentRight' => $this->getData(['page',$this->getData(['page',$this->getUrl(0),'barRight']),'content']),
 				'contentLeft'  => $this->getData(['page',$this->getData(['page',$this->getUrl(0),'barLeft']),'content']),
-				'targetLity' => is_null($this->getData(['page', $this->getUrl(0), 'targetLity'])) ? false : $this->getData(['page', $this->getUrl(0), 'targetLity'])
 			]);
 		}
 		// Importe le module
@@ -1608,8 +1609,7 @@ class core extends common {
 					'iconUrl' => $this->getData(['page', $this->getUrl(0), 'iconUrl']),
 					'disable' => $this->getData(['page', $this->getUrl(0), 'disable']),
 					'contentRight' => $this->getData(['page',$this->getData(['page',$this->getUrl(0),'barRight']),'content']),
-					'contentLeft'  => $this->getData(['page',$this->getData(['page',$this->getUrl(0),'barLeft']),'content']),
-					'targetLity' => is_null($this->getData(['page', $this->getUrl(0), 'targetLity'])) ? false : $this->getData(['page', $this->getUrl(0), 'targetLity'])
+					'contentLeft'  => $this->getData(['page',$this->getData(['page',$this->getUrl(0),'barLeft']),'content'])
 				]);
 				$pageContent = $this->getData(['page', $this->getUrl(0), 'content']);
 			}
@@ -1815,40 +1815,30 @@ class core extends common {
 				'metaDescription' => $this->getData(['config', 'metaDescription'])
 			]);
 		}
-		// Traitement de la popup hors connexion.
-		if( $this->output['targetLity'] &&
-		 	$this->getUser('password') !== $this->getInput('ZWII_USER_PASSWORD')
-		)  {
-			$this->output['display'] = self::DISPLAY_LAYOUT_POPUP;
-		}
 				
-		switch($this->output['display']) {
-			// Layout vide
-			case self::DISPLAY_LAYOUT_BLANK:
-				require 'core/layout/blank.php';
-				break;
-			// Affichage en JSON
-			case self::DISPLAY_JSON:
-				header('Content-Type: application/json');
-				echo json_encode($this->output['content']);
-				break;
-			// Layout alléger
-			case self::DISPLAY_LAYOUT_LIGHT:
-				require 'core/layout/light.php';
-				break;
-			// Layout principal
-			case self::DISPLAY_LAYOUT_MAIN:
-				require 'core/layout/main.php';
-				break;
-			// Layout poup lity
-			case self::DISPLAY_LAYOUT_POPUP:
-				require 'core/layout/popup.php';
-				break;								
-			// Layout brut
-			case self::DISPLAY_RAW:
-				echo $this->output['content'];
-				break;
-		}		
+	switch($this->output['display']) {
+		// Layout vide
+		case self::DISPLAY_LAYOUT_BLANK:
+			require 'core/layout/blank.php';
+			break;
+		// Affichage en JSON
+		case self::DISPLAY_JSON:
+			header('Content-Type: application/json');
+			echo json_encode($this->output['content']);
+			break;
+		// Layout alléger
+		case self::DISPLAY_LAYOUT_LIGHT:
+			require 'core/layout/light.php';
+			break;
+		// Layout principal
+		case self::DISPLAY_LAYOUT_MAIN:
+			require 'core/layout/main.php';
+			break;							
+		// Layout brut
+		case self::DISPLAY_RAW:
+			echo $this->output['content'];
+			break;				
+		}
 	}
 
 }
@@ -2098,7 +2088,6 @@ class layout extends common {
 			// Propriétés de l'item
 			$active = ($parentPageId === $currentPageId OR in_array($currentPageId, $childrenPageIds)) ? ' class="active"' : '';
 			$targetBlank = $this->getData(['page', $parentPageId, 'targetBlank']) ? ' target="_blank"' : '';
-			$targetLity = ($this->getData(['page', $parentPageId, 'targetLity'])  && $this->getUser('password') !== $this->getInput('ZWII_USER_PASSWORD')) ? ' rel="data-lity"' : '';	
 			// Mise en page de l'item
 			$items .= '<li>';
 			
@@ -2107,7 +2096,7 @@ class layout extends common {
 
 					{$items .= '<a href="'.$this->getUrl(1).'">';
 			} else {
-					$items .= '<a href="' . helper::baseUrl() . $parentPageId . '"' . $active . $targetBlank . $targetLity . '>';	
+					$items .= '<a href="' . helper::baseUrl() . $parentPageId . '"' . $active . $targetBlank . '>';	
 			}
 
 			switch ($this->getData(['page', $parentPageId, 'typeMenu'])) {
@@ -2154,15 +2143,14 @@ class layout extends common {
 			foreach($childrenPageIds as $childKey) {			
 				// Propriétés de l'item
 				$active = ($childKey === $currentPageId) ? ' class="active"' : '';
-				$targetBlank = $this->getData(['page', $childKey, 'targetBlank']) ? ' target="_blank"' : '';
-				$targetLity = ($this->getData(['page', $childKey, 'targetLity'])  && $this->getUser('password') !== $this->getInput('ZWII_USER_PASSWORD')) ? ' rel="data-lity"' : '';		
+				$targetBlank = $this->getData(['page', $childKey, 'targetBlank']) ? ' target="_blank"' : '';				
 				// Mise en page du sous-item
 				$items .= '<li>';
 				if ( $this->getData(['page',$childKey,'disable']) === true
 					AND $this->getUser('password') !== $this->getInput('ZWII_USER_PASSWORD')	) {
 						$items .= '<a href="'.$this->getUrl(1).'">';
 				} else {
-					$items .= '<a href="' . helper::baseUrl() . $childKey . '"' . $active . $targetBlank  . $targetLity . '>';			
+					$items .= '<a href="' . helper::baseUrl() . $childKey . '"' . $active . $targetBlank  .  '>';			
 				}
 
 				switch ($this->getData(['page', $childKey, 'typeMenu'])) {
@@ -2255,7 +2243,6 @@ class layout extends common {
 			// Propriétés de l'item
 			$active = ($parentPageId === $currentPageId OR in_array($currentPageId, $childrenPageIds)) ? ' class="active"' : '';
 			$targetBlank = $this->getData(['page', $parentPageId, 'targetBlank']) ? ' target="_blank"' : '';
-			$targetLity = ($this->getData(['page', $parentPageId, 'targetLity'])  && $this->getUser('password') !== $this->getInput('ZWII_USER_PASSWORD')) ? ' rel="data-lity"' : '';	
 			// Mise en page de l'item;
 			// Ne pas afficher le parent d'une sous-page quand l'option est sélectionnée.
 			if ($onlyChildren === false) {
@@ -2264,7 +2251,7 @@ class layout extends common {
 					AND $this->getUser('password') !== $this->getInput('ZWII_USER_PASSWORD')	) {
 						$items .= '<a href="'.$this->getUrl(1).'">';
 				} else {
-						$items .= '<a href="' . helper::baseUrl() . $parentPageId . '"' . $active . $targetBlank . $targetLity . '>';	
+						$items .= '<a href="' . helper::baseUrl() . $parentPageId . '"' . $active . $targetBlank . '>';	
 				}
 				$items .= $this->getData(['page', $parentPageId, 'title']);
 				$items .= '</a>';
@@ -2278,8 +2265,7 @@ class layout extends common {
 				
 				// Propriétés de l'item
 				$active = ($childKey === $currentPageId) ? ' class="active"' : '';
-				$targetBlank = $this->getData(['page', $childKey, 'targetBlank']) ? ' target="_blank"' : '';
-				$targetLity = ($this->getData(['page', $childKey, 'targetLity'])  && $this->getUser('password') !== $this->getInput('ZWII_USER_PASSWORD')) ? ' rel="data-lity"' : '';	
+				$targetBlank = $this->getData(['page', $childKey, 'targetBlank']) ? ' target="_blank"' : '';				
 				// Mise en page du sous-item
 				$itemsChildren .= '<li class="menuSideChild">';
 
@@ -2287,7 +2273,7 @@ class layout extends common {
 					AND $this->getUser('password') !== $this->getInput('ZWII_USER_PASSWORD')	) {
 						$itemsChildren .= '<a href="'.$this->getUrl(1).'">';
 				} else {
-					$itemsChildren .= '<a href="' . helper::baseUrl() . $childKey . '"' . $active . $targetBlank . $targetLity . '>';
+					$itemsChildren .= '<a href="' . helper::baseUrl() . $childKey . '"' . $active . $targetBlank . '>';
 				}
 
 				$itemsChildren .= $this->getData(['page', $childKey, 'title']);					

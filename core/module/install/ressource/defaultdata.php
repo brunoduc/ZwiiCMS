@@ -105,7 +105,7 @@ class init extends common {
 				'displayVersion' => true,
 				'displaySiteMap' => true,
 				'displayCopyright' => false,
-				'displayLegal' => true,
+				'displayLegal' => false,
 				'displaySearch' => false,
 				'template' => '3'
 			],
@@ -496,7 +496,6 @@ class init extends common {
 				'position' => 0,
 				'group' => 0,
 				'targetBlank' => false,
-				'targetLity' => false,
 				'title' => 'Mentions légales',
 				'block' => '12',
 				'barLeft' => '',
@@ -524,7 +523,6 @@ class init extends common {
 				'position' => 0,
 				'group' => 0,
 				'targetBlank' => false,
-				'targetLity' => false,
 				'title' => 'Mentions légales',
 				'block' => '12',
 				'barLeft' => '',
@@ -594,6 +592,11 @@ class init extends common {
 						'desertjpg' => 'Un désert',
 						'icebergjpg' => 'Un iceberg',
 						'meadowjpg' => 'Une prairie'
+					],
+					'position' => [
+						'desertjpg' => 3,
+						'icebergjpg' => 1,
+						'meadowjpg' => 2
 					]
 				],
 				'espace' => [
@@ -608,6 +611,11 @@ class init extends common {
 						'earthjpg' => 'La Terre et la Lune',
 						'cosmosjpg' => 'Le cosmos',
 						'nebulajpg' => 'Une nébuleuse'
+					],
+					'position' => [
+						'earthjpg' => 1,
+						'cosmosjpg' => 3,
+						'nebulajpg' => 2
 					]
 				]
 			],

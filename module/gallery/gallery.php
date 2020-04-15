@@ -14,19 +14,23 @@
 
 class gallery extends common {
 
+	const SORT_ASC = 'SORT_ASC';
+	const SORT_DSC = 'SORT_DSC';
+	const SORT_HAND = 'SORT_HAND';
+
 	public static $actions = [
 		'config' => self::GROUP_MODERATOR,
 		'delete' => self::GROUP_MODERATOR,
 		'dirs' => self::GROUP_MODERATOR,
+		'sort' => self::GROUP_MODERATOR,
 		'edit' => self::GROUP_MODERATOR,
-		'filter' => self::GROUP_MODERATOR,
 		'index' => self::GROUP_VISITOR		
 	];
 
 	public static $sort = [
-		'SORT_ASC' => 'Alphabétique ',
-		'SORT_DSC' => 'Alphabétique inversé',
-		'none' => 'Aucun tri',
+		self::SORT_ASC  => 'Alphabétique ',
+		self::SORT_DSC  => 'Alphabétique inversé',
+		self::SORT_HAND => 'Tri manuel'
 	];
 
 	public static $directories = [];
@@ -39,38 +43,41 @@ class gallery extends common {
 
 	public static $pictures = [];
 
+	public static $picturesId = [];
+
 	public static $thumbs = [];
 
-	const GALLERY_VERSION = '2.0';	
+	const GALLERY_VERSION = '2.08';	
 
 
-	public function filter() {
-	// Traitement du tri
-		$data = explode('&',($this->getInput('galleryConfigFilterResponse')));
-		$data = str_replace('galleryTable%5B%5D=','',$data);
-		for($i=0;$i<count($data);$i++) {
-			$this->setData(['module', $this->getUrl(0), $data[$i], [
-				'config' => [
-					'name' => $this->getData(['module',$this->getUrl(0),$data[$i],'config','name']),
-					'directory' => $this->getData(['module',$this->getUrl(0),$data[$i],'config','directory']),
-					'homePicture' => $this->getData(['module',$this->getUrl(0),$data[$i],'config','homePicture']),
-					'sort' => $this->getData(['module',$this->getUrl(0),$data[$i],'config','sort']),
-					'position' => $i + 1 
-				],
-				'legend' => $this->getData(['module',$this->getUrl(0),$data[$i],'legend'])
-			]]);
-		}		
-		$this->saveData();
-		// Valeurs en sortie
-		// Recharge la page
-		header('Refresh: 0;url='. helper::baseUrl() . $this->getUrl() );	
+	/**
+	 * Tri sans bouton
+	 */
+	public function sort () {
+		if($_POST['response']) {
+			$data = explode('&',$_POST['response']);
+			$data = str_replace('galleryTable%5B%5D=','',$data);
+			for($i=0;$i<count($data);$i++) {
+				$this->setData(['module', $this->getUrl(0), $data[$i], [
+					'config' => [
+						'name' => $this->getData(['module',$this->getUrl(0),$data[$i],'config','name']),
+						'directory' => $this->getData(['module',$this->getUrl(0),$data[$i],'config','directory']),
+						'homePicture' => $this->getData(['module',$this->getUrl(0),$data[$i],'config','homePicture']),
+						'sort' => $this->getData(['module',$this->getUrl(0),$data[$i],'config','sort']),
+						'position' => $i
+					],
+					'legend' => $this->getData(['module',$this->getUrl(0),$data[$i],'legend'])
+				]]);
+			}	
+		}
 	}
+
 
 	/**
 	 * Configuration
 	 */
 	public function config() {
-		// Tri des galeries 
+		//Affichage de la galerie triée
 		$g = $this->getData(['module', $this->getUrl(0)]);
 		$p = helper::arrayCollumn(helper::arrayCollumn($g,'config'),'position');
 		asort($p,SORT_NUMERIC);		
@@ -110,14 +117,11 @@ class gallery extends common {
 				self::$galleriesId[] = $galleryId;
 			}
 		}
-		// Soumission du formulaire
-
+		// Soumission du formulaire d'ajout d'une galerie
 		if($this->isPost()) {
-			if ($this->getInput('galleryConfigFilterResponse')) {
-				self::filter();
-			} else {
-				$galleryId = helper::increment($this->getInput('galleryConfigName', helper::FILTER_ID, true), (array) $this->getData(['module', $this->getUrl(0)]));
-				// La première image est celle de la couverture de l'album
+			if (!$this->getInput('galleryConfigFilterResponse')) {
+				$galleryId = helper::increment($this->getInput('galleryConfigName', helper::FILTER_ID, true), (array) $this->getData(['module', $this->getUrl(0)]));								
+				// définir une vignette par défaut
 				$directory = $this->getInput('galleryConfigDirectory', helper::FILTER_STRING_SHORT, true);
 				$iterator = new DirectoryIterator($directory);				
 				foreach($iterator as $fileInfos) {
@@ -129,26 +133,24 @@ class gallery extends common {
 											self::THUMBS_WIDTH);
 						}
 						// Miniatures 
-						$homePicture = file_exists( str_replace('source','thumb',$directory) . '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename())) 
-							?  self::THUMBS_SEPARATOR .  strtolower($fileInfos->getFilename())
-							:  strtolower($fileInfos->getFilename());
+						$homePicture = strtolower($fileInfos->getFilename());
 					break;
 					}
 				}
-
 				$this->setData(['module', $this->getUrl(0), $galleryId, [
 					'config' => [
 						'name' => $this->getInput('galleryConfigName'),
 						'directory' => $this->getInput('galleryConfigDirectory', helper::FILTER_STRING_SHORT, true),
 						'homePicture' => $homePicture,
-						'sort' => $this->getInput('galleryConfigSort'),
+						'sort' => self::SORT_ASC,
 						'position' => count($this->getData(['module',$this->getUrl(0)])) + 1
 					],
-					'legend' => []
+					'legend' => [],
+					'position' => []
 				]]);
 				// Valeurs en sortie
 				$this->addOutput([
-					'redirect' => helper::baseUrl() . $this->getUrl(),
+					'redirect' => helper::baseUrl() . $this->getUrl() /*. '#galleryConfigForm'*/,
 					'notification' => 'Modifications enregistrées',
 					'state' => true
 				]);
@@ -230,6 +232,23 @@ class gallery extends common {
 		else {
 			// Soumission du formulaire
 			if($this->isPost()) {
+				/**
+				 * $picturesPosition contien un tableau avec les images triées
+				 */
+				$picturesPosition = [];
+				if ($this->getInput('galleryEditFormResponse') &&
+					$this->getInput('galleryEditSort') === self::SORT_HAND) {
+					// Tri des images si valeur de retour et choix manuel
+					$picturesPosition = explode('&',($this->getInput('galleryEditFormResponse')));
+					$picturesPosition = str_replace('galleryTable%5B%5D=','',$picturesPosition);	
+					$picturesPosition = array_flip($picturesPosition);				
+				}
+				// Tri manuel sélectionné mais de déplacement, reprendre la config sauvegardée
+				if ($this->getInput('galleryEditSort') === self::SORT_HAND &&
+				   empty($picturesPosition)) {
+					$picturesPosition  = $this->getdata(['module', $this->getUrl(0), $this->getUrl(2), 'position']);
+					// Si la position sauvegardée est vide, on activera le tri alpha
+				}
 				// Si l'id a changée
 				$galleryId = $this->getInput('galleryEditName', helper::FILTER_ID, true);
 				if($galleryId !== $this->getUrl(2)) {
@@ -241,25 +260,33 @@ class gallery extends common {
 				// légendes
 				$legends = [];
 				foreach((array) $this->getInput('legend', null) as $file => $legend) {
+					// Image de couverure par défaut si non définie
+					$homePicture = $file;
 					$file = str_replace('.','',$file);
 					$legends[$file] = helper::filter($legend, helper::FILTER_STRING_SHORT);
+
 				}
-				// Photo de la page de garde de l'album
-				$homePicture = array_keys($this->getInput('homePicture', null));
+				// Photo de la page de garde de l'album définie dans form
+				if (is_array($this->getInput('homePicture', null)) ) {
+					$d = array_keys($this->getInput('homePicture', null));
+					$homePicture = $d[0];
+				}
 				// Sauvegarder
 				$this->setData(['module', $this->getUrl(0), $galleryId, [
 					'config' => [
 						'name' => $this->getInput('galleryEditName', helper::FILTER_STRING_SHORT, true),
 						'directory' => $this->getInput('galleryEditDirectory', helper::FILTER_STRING_SHORT, true),
-						'homePicture' => $homePicture[0],
-						'sort' => $this->getInput('galleryEditSort'),
-						'position' => count($this->getData(['module',$this->getUrl(0)])) + 1
+						'homePicture' => $homePicture,
+						// pas de positions, on active le tri alpha
+						'sort' =>  (empty($picturesPosition) && $this->getInput('galleryEditSort') === self::SORT_HAND) ? self::SORT_ASC : $this->getInput('galleryEditSort'),
+						'position' => $this->getData(['module', $this->getUrl(0), $galleryId,'config','position']) === '' ? count($this->getData(['module',$this->getUrl(0)]))-1 : $this->getData(['module', $this->getUrl(0), $galleryId,'config','position'])
 					],
-					'legend' => $legends
+					'legend' => $legends,
+					'position' => $picturesPosition
 				]]);
-				// Valeurs en sortie
+				// Valeurs en sortie				
 				$this->addOutput([
-					'redirect' => helper::baseUrl() . $this->getUrl(0) . '/config',
+					'redirect' => helper::baseUrl() . $this->getUrl(0) . '/edit/' . $galleryId  . '/' . $_SESSION['csrf'] ,
 					'notification' => 'Modifications enregistrées',
 					'state' => true
 				]);
@@ -268,45 +295,60 @@ class gallery extends common {
 			$directory = $this->getData(['module', $this->getUrl(0), $this->getUrl(2), 'config', 'directory']);
 			if(is_dir($directory)) {
 				$iterator = new DirectoryIterator($directory);
+				
 				foreach($iterator as $fileInfos) {
 					if($fileInfos->isDot() === false AND $fileInfos->isFile() AND @getimagesize($fileInfos->getPathname())) {
-						// Créer la miniature si manquante
-						if (!file_exists( str_replace('source','thumb',$fileInfos->getPathname()) . '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()))) {
+						// Créer la miniature RFM si manquante
+						if (!file_exists( str_replace('source','thumb',$fileInfos->getPathname()) . '/' . strtolower($fileInfos->getFilename()))) {
 							$this->makeThumb($fileInfos->getPathname(),
-											str_replace('source','thumb',$fileInfos->getPath()) .  '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()),
-											self::THUMBS_WIDTH);
+											str_replace('source','thumb',$fileInfos->getPath()) .  '/' .  strtolower($fileInfos->getFilename()),
+											122);
 						}
-						self::$pictures[$fileInfos->getFilename()] = [
+						self::$pictures[str_replace('.','',$fileInfos->getFilename())] = [								
+							template::ico('sort'),
 							$fileInfos->getFilename(),
 							template::checkbox( 'homePicture[' . $fileInfos->getFilename() . ']', true, '', [ 
 								'checked' => $this->getData(['module', $this->getUrl(0), $this->getUrl(2),'config', 'homePicture']) === $fileInfos->getFilename() ? true : false,
 								'class' => 'homePicture'
-
 							]),	
 							template::text('legend[' . $fileInfos->getFilename() . ']', [
 								'value' => $this->getData(['module', $this->getUrl(0), $this->getUrl(2), 'legend', str_replace('.','',$fileInfos->getFilename())])
 							]),
-							'<a href="'. str_replace('source','thumb',$directory)  . '/mini_' . $fileInfos->getFilename() .'" rel="data-lity" data-lity=""><img src="'. str_replace('source','thumb',$directory) . '/' . $fileInfos->getFilename() .  '"></a>'
+							'<a href="' .  $fileInfos->getPathname() .'" rel="data-lity" data-lity=""><img src="'. str_replace('source','thumb',$directory) . '/' . $fileInfos->getFilename() .  '"></a>'
 						];
+						self::$picturesId [] = str_replace('.','',$fileInfos->getFilename());
 					}
 				}
-				// Tri des images par ordre alphabétique
+				// Tri des images 		
 				switch ($this->getData(['module', $this->getUrl(0), $this->getUrl(2), 'config', 'sort'])) {
-					case 'none':
+					case self::SORT_HAND:
+						$positions = $this->getdata(['module',$this->getUrl(0), $this->getUrl(2),'position']);
+						if ($positions) {
+							foreach ($positions as $position => $name) {
+								$tempPictures [] = self::$pictures[$position];							
+								$tempPicturesId [] = $position;																
+							}							
+							self::$pictures = $tempPictures;
+							self::$picturesId  = $tempPicturesId;
+						}
 						break;
-					case 'SORT_DSC':
-						krsort(self::$pictures,SORT_NATURAL);
-						break;													
-					case 'SORT_ASC':
-					default:
+					case self::SORT_ASC:
 						ksort(self::$pictures,SORT_NATURAL);
-						break;
+						sort(self::$picturesId,SORT_NATURAL);
+						break;						
+					case self::SORT_DSC:
+						krsort(self::$pictures,SORT_NATURAL);
+						rsort(self::$picturesId,SORT_NATURAL);
+						break;													
 				}	
 			}
 			// Valeurs en sortie
 			$this->addOutput([
 				'title' => $this->getData(['module', $this->getUrl(0), $this->getUrl(2), 'config', 'name']),
-				'view' => 'edit'
+				'view' => 'edit',
+				'vendor' => [
+					'tablednd'
+				]
 			]);
 		}
 	}
@@ -332,7 +374,8 @@ class gallery extends common {
 					$iterator = new DirectoryIterator($directory);
 					foreach($iterator as $fileInfos) {
 						if($fileInfos->isDot() === false AND $fileInfos->isFile() AND @getimagesize($fileInfos->getPathname())) {
-							self::$pictures[$directory . '/' . $fileInfos->getFilename()] = $this->getData(['module', $this->getUrl(0), $this->getUrl(1), 'legend', str_replace('.','',$fileInfos->getFilename())]);
+							self::$pictures[$directory . '/' . $fileInfos->getFilename()] = $this->getData(['module', $this->getUrl(0), $this->getUrl(1), 'legend', str_replace('.','',$fileInfos->getFilename())]);							
+							$picturesSort[$directory . '/' . $fileInfos->getFilename()] = $this->getData(['module', $this->getUrl(0), $this->getUrl(1), 'position', str_replace('.','',$fileInfos->getFilename())]);
 							// Créer la miniature si manquante
 							if (!file_exists( str_replace('source','thumb',$fileInfos->getPathname()) . '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()))) {
 								$this->makeThumb($fileInfos->getPathname(),
@@ -340,19 +383,26 @@ class gallery extends common {
 												self::THUMBS_WIDTH);
 							}							
 							// Définir la Miniature
-							self::$thumbs[$directory . '/' . $fileInfos->getFilename()] = file_exists( str_replace('source','thumb',$directory) . '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename())) 
-								? str_replace('source','thumb',$directory) . '/' . self::THUMBS_SEPARATOR .  strtolower($fileInfos->getFilename())
-								: str_replace('source','thumb',$directory) . '/' .  strtolower($fileInfos->getFilename());
+							self::$thumbs[$directory . '/' . $fileInfos->getFilename()] = 	file_exists( str_replace('source','thumb',$directory) . '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename())) 
+																							? str_replace('source','thumb',$directory) . '/' . self::THUMBS_SEPARATOR .  strtolower($fileInfos->getFilename())
+																							: str_replace('source','thumb',$directory) . '/' .  strtolower($fileInfos->getFilename());
 						}
 					}
 					// Tri des images par ordre alphabétique
 					switch ($this->getData(['module', $this->getUrl(0), $this->getUrl(1), 'config', 'sort'])) {
-						case 'none':
-							break;
-						case 'SORT_DSC':
+						case self::SORT_HAND:
+							asort($picturesSort);
+							if ($picturesSort) {
+								foreach ($picturesSort as $name => $position) {
+									$temp[$name] = self::$pictures[$name];
+								}				
+								self::$pictures = $temp;
+								break;
+							}
+						case self::SORT_DSC:
 							krsort(self::$pictures,SORT_NATURAL);
 							break;													
-						case 'SORT_ASC':
+						case self::SORT_ASC:
 						default:
 							ksort(self::$pictures,SORT_NATURAL);
 							break;
@@ -364,10 +414,6 @@ class gallery extends common {
 					$this->addOutput([
 						'showBarEditButton' => true,
 						'title' => $this->getData(['module', $this->getUrl(0), $this->getUrl(1), 'config', 'name']),
-						/* Désactivé car SLB est actif pour tout le site
-						'vendor' => [
-							'simplelightbox'
-						],*/
 						'view' => 'gallery'
 					]);
 				}
@@ -399,15 +445,15 @@ class gallery extends common {
 						if($fileInfos->isDot() === false AND $fileInfos->isFile() AND @getimagesize($fileInfos->getPathname())) {
 							self::$galleries[$galleryId] = $gallery;
 							// Créer la miniature si manquante
-							if (!file_exists( str_replace('source','thumb',$fileInfos->getPathname()) . '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()))) {
-								$this->makeThumb($fileInfos->getPathname(),
-												str_replace('source','thumb',$fileInfos->getPath()) .  '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()),
+							if (!file_exists( str_replace('source','thumb',$fileInfos->getPathname()) . '/' . self::THUMBS_SEPARATOR  . strtolower($gallery['config']['homePicture']))) {
+								$this->makeThumb($gallery['config']['directory'] . '/' . str_replace(self::THUMBS_SEPARATOR ,'',$gallery['config']['homePicture']),
+												str_replace('source','thumb',$fileInfos->getPath()) .  '/' . self::THUMBS_SEPARATOR  . strtolower($gallery['config']['homePicture']),
 												self::THUMBS_WIDTH);
 							}	
 							// Définir l'image de couverture
-							self::$firstPictures[$galleryId] = file_exists( str_replace('source','thumb',$gallery['config']['directory']) . '/' . self::THUMBS_SEPARATOR  . strtolower($gallery['config']['homePicture'])) 
-								? str_replace('source','thumb',$gallery['config']['directory']) . '/' . self::THUMBS_SEPARATOR .  strtolower($gallery['config']['homePicture'])
-								: str_replace('source','thumb',$gallery['config']['directory']) . '/' .  strtolower($gallery['config']['homePicture']);
+							self::$firstPictures[$galleryId] =	file_exists( str_replace('source','thumb',$gallery['config']['directory']) . '/' . self::THUMBS_SEPARATOR  . $gallery['config']['homePicture'])
+																? str_replace('source','thumb',$gallery['config']['directory']) . '/' . self::THUMBS_SEPARATOR .  strtolower($gallery['config']['homePicture'])
+																: str_replace('source','thumb',$gallery['config']['directory']) . '/' .  strtolower($gallery['config']['homePicture']);
 							continue(2);
 						}
 					}

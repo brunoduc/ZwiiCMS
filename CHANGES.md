@@ -2,6 +2,8 @@
 
 
 ## version 10.0.00
+- Mise à jour :
+    - SimpleLightBox v2.1.4
 - Architecture de stockage des données.
     - Les données sont désormais stockées dans des fichiers distincts (core, config, theme, user, page et module).
     - Les données relatives aux pages et aux modules sont stockées dans un dossier localisé fr par défaut.
@@ -18,10 +20,11 @@
     - L'importation des données est possible uniquement à partir d'une version 9.
     - Fonction d'import des données provenant d'autres version de ZwiiCMS, avec option de préservation des données utilisateurs.
     - Nouveau masque dédié à la sauvegarde automatique, à l'import et à l'export des données de site.
-- Modification :
+- Modifications :
     - Module gallery optimisé, tri dynamique.
     - Chargement paresseux des images.
-    
+    - Edtion de page : suppression de l'option d'ouverture dans une lity.
+
 ## version 9.2.27
 - Corrections :
     - Pages d'administration, thème spécifique

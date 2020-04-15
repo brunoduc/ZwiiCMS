@@ -54,3 +54,42 @@ $('.homePicture').click(function(){
 	$('.homePicture').prop('checked', false);
 	$(this).prop('checked', true);
 });
+
+/**
+ * Tri dynamique de la galerie
+ */
+
+$( document ).ready(function() {
+
+	$("#galleryTable").tableDnD({		
+		onDrop: function(table, row) {
+			$("#galleryEditFormResponse").val($.tableDnD.serialize());
+		},
+		serializeRegexp:  ""
+	});
+
+	if ($("#galleryEditSort").val() !==  "SORT_HAND") {
+		$("#galleryTable tr").addClass("nodrag nodrop");
+		$(".zwiico-sort").hide();
+		$("#galleryTable").tableDnDUpdate();
+	} else {
+		$("#galleryTable tr").removeClass("nodrag nodrop");
+		$(".zwiico-sort").show();
+		$("#galleryTable").tableDnDUpdate();
+	}
+
+});
+
+$("#galleryEditSort").change(function() {
+	if ($("#galleryEditSort").val() !==  "SORT_HAND") {
+		$("#galleryTable tr").addClass("nodrag nodrop");
+		$(".zwiico-sort").hide();
+		$("#galleryTable").tableDnDUpdate();
+	} else {
+		$("#galleryTable tr").removeClass("nodrag nodrop");
+		$(".zwiico-sort").show();
+		$("#galleryTable").tableDnDUpdate();
+	}
+});
+
+

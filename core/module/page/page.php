@@ -259,10 +259,29 @@ class page extends common {
 					$hideTitle = true;
 				}
 				// Modifie la page ou en crée une nouvelle si l'id a changé
+				// Si le submit provient du bouton Enregistrer on libère le verrou
+				if(isset($_POST['pageEditSubmit'])){
+					$val_editing = false;
+					$val_editing_csrf = '';
+					$val_editing_time = 0;
+				}
+				else{
+					//Si la page n'existe pas on initialise sinon on conserve les paramètres
+					if(null === $this->getData(['page', $pageId])){
+						$val_editing = true;
+						$val_editing_csrf = $_SESSION['csrf'];
+						$val_editing_time = time();
+					}
+					else{
+						$val_editing = $this->getData(['page', $pageId , 'editing']);
+						$val_editing_csrf = $this->getData(['page', $pageId , 'editing_csrf']);
+						$val_editing_time = $this->getData(['page', $pageId , 'editing_time']);
+					}
+				}	
 				$this->setData([
 					'page',
 					$pageId,
-					[					
+					[
 						'typeMenu' => $this->getinput('pageTypeMenu'),
 						'iconUrl' => $this->getinput('pageIconUrl'),
 						'disable'=> $this->getinput('pageEditDisable', helper::FILTER_BOOLEAN), 						
@@ -285,11 +304,12 @@ class page extends common {
 						'hideMenuSide' => $this->getinput('pageEditHideMenuSide', helper::FILTER_BOOLEAN),
 						'hideMenuHead' => $this->getinput('pageEditHideMenuHead', helper::FILTER_BOOLEAN),
 						'hideMenuChildren' => $this->getinput('pageEditHideMenuChildren', helper::FILTER_BOOLEAN),
-						'editing' => false,
-						'editing_csrf' => '',
-						'editing_time' => 0
+						'editing' => $val_editing,
+						'editing_csrf' => $val_editing_csrf,
+						'editing_time' => $val_editing_time
 					]
-				]);				
+				]);					
+				
 				// Barre renommée : changement le nom de la barre dans les pages mères
 				if ($this->getinput('pageEditBlock') === 'bar') {
 					foreach ($this->getHierarchy() as $eachPageId=>$parentId) {
@@ -332,7 +352,8 @@ class page extends common {
 			else{
 				//La page est en cours d'édition et editing_time est voisin de time() (le navigateur n'est pas fermé !)
 				if($this->getData(['page', $this->getUrl(2),'editing']) === true
-					&& time() - $this->getData(['page', $this->getUrl(2),'editing_time']) < 120 ){
+					&& time() - $this->getData(['page', $this->getUrl(2),'editing_time']) < 120
+				  	&& $this->getData(['page', $this->getUrl(2),'editing_csrf']) != $_SESSION['csrf']){
 					// Valeurs en sortie
 					$this->addOutput([
 						'redirect' => helper::baseUrl() . $pageId,

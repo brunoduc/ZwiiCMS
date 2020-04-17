@@ -8,6 +8,8 @@
  *
  * @author Rémi Jean <remi.jean@outlook.com>
  * @copyright Copyright (C) 2008-2018, Rémi Jean
+ * @author Frédéric Tempez <frederic.tempez@outlook.com>
+ * @copyright Copyright (C) 2018-2020, Frédéric Tempez
  * @license GNU General Public License, version 3
  * @link http://zwiicms.com/
  */
@@ -47,7 +49,7 @@ class gallery extends common {
 
 	public static $thumbs = [];
 
-	const GALLERY_VERSION = '2.09';	
+	const GALLERY_VERSION = '2.15';	
 
 
 	/**
@@ -64,9 +66,12 @@ class gallery extends common {
 						'directory' => $this->getData(['module',$this->getUrl(0),$data[$i],'config','directory']),
 						'homePicture' => $this->getData(['module',$this->getUrl(0),$data[$i],'config','homePicture']),
 						'sort' => $this->getData(['module',$this->getUrl(0),$data[$i],'config','sort']),
-						'position' => $i
+						'position' => $i,
+						'fullScreen' => $this->getData(['module',$this->getUrl(0),$data[$i],'config','fullScreen'])
+
 					],
-					'legend' => $this->getData(['module',$this->getUrl(0),$data[$i],'legend'])
+					'legend' => $this->getData(['module',$this->getUrl(0),$data[$i],'legend']),
+					'position' => $this->getData(['module',$this->getUrl(0),$data[$i],'position'])
 				]]);
 			}	
 		}
@@ -127,7 +132,7 @@ class gallery extends common {
 				foreach($iterator as $fileInfos) {
 					if($fileInfos->isDot() === false AND $fileInfos->isFile() AND @getimagesize($fileInfos->getPathname())) {						
 						// Créer la miniature si manquante
-						if (!file_exists( str_replace('source','thumb',$fileInfos->getPathname()) . '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()))) {
+						if (!file_exists( str_replace('source','thumb',$fileInfos->getPath()) . '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()))) {
 							$this->makeThumb($fileInfos->getPathname(),
 											str_replace('source','thumb',$fileInfos->getPath()) .  '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()),
 											self::THUMBS_WIDTH);
@@ -143,7 +148,8 @@ class gallery extends common {
 						'directory' => $this->getInput('galleryConfigDirectory', helper::FILTER_STRING_SHORT, true),
 						'homePicture' => $homePicture,
 						'sort' => self::SORT_ASC,
-						'position' => count($this->getData(['module',$this->getUrl(0)])) + 1
+						'position' => $this->getData(['module',$this->getUrl(0)]) !== null ? count($this->getData(['module',$this->getUrl(0)])) + 1 : 0,
+						'fullScreen' => false
 					],
 					'legend' => [],
 					'position' => []
@@ -233,7 +239,7 @@ class gallery extends common {
 			// Soumission du formulaire
 			if($this->isPost()) {
 				/**
-				 * $picturesPosition contien un tableau avec les images triées
+				 * $picturesPosition contient un tableau avec les images triées
 				 */
 				$picturesPosition = [];
 				if ($this->getInput('galleryEditFormResponse') &&
@@ -279,7 +285,9 @@ class gallery extends common {
 						'homePicture' => $homePicture,
 						// pas de positions, on active le tri alpha
 						'sort' =>  (empty($picturesPosition) && $this->getInput('galleryEditSort') === self::SORT_HAND) ? self::SORT_ASC : $this->getInput('galleryEditSort'),
-						'position' => $this->getData(['module', $this->getUrl(0), $galleryId,'config','position']) === '' ? count($this->getData(['module',$this->getUrl(0)]))-1 : $this->getData(['module', $this->getUrl(0), $galleryId,'config','position'])
+						'position' => $this->getData(['module', $this->getUrl(0), $galleryId,'config','position']) === '' ? count($this->getData(['module',$this->getUrl(0)]))-1 : $this->getData(['module', $this->getUrl(0), $galleryId,'config','position']),
+						'fullScreen' => $this->getInput('galleryEditFullscreen', helper::FILTER_BOOLEAN)
+
 					],
 					'legend' => $legends,
 					'position' => $picturesPosition
@@ -299,7 +307,7 @@ class gallery extends common {
 				foreach($iterator as $fileInfos) {
 					if($fileInfos->isDot() === false AND $fileInfos->isFile() AND @getimagesize($fileInfos->getPathname())) {
 						// Créer la miniature RFM si manquante
-						if (!file_exists( str_replace('source','thumb',$fileInfos->getPathname()) . '/' . strtolower($fileInfos->getFilename()))) {
+						if (!file_exists( str_replace('source','thumb',$fileInfos->getPath()) . '/' . strtolower($fileInfos->getFilename()))) {
 							$this->makeThumb($fileInfos->getPathname(),
 											str_replace('source','thumb',$fileInfos->getPath()) .  '/' .  strtolower($fileInfos->getFilename()),
 											122);
@@ -324,10 +332,19 @@ class gallery extends common {
 					case self::SORT_HAND:
 						$positions = $this->getdata(['module',$this->getUrl(0), $this->getUrl(2),'position']);
 						if ($positions) {
-							foreach ($positions as $position => $name) {
-								$tempPictures [] = self::$pictures[$position];							
-								$tempPicturesId [] = $position;																
-							}							
+							foreach ($positions as $key => $value) {
+								if (array_key_exists($key,self::$pictures)) {
+									$tempPictures[$key] = self::$pictures[$key];
+									$tempPicturesId [] = $key;
+								}
+							}	
+							// Images ayant été ajoutées dans le dossier mais non triées
+							foreach (self::$pictures as $key => $value) {
+								if (!array_key_exists($key,$tempPictures)) {
+									$tempPictures[$key] = self::$pictures[$key];
+									$tempPicturesId [] = $key;
+								}
+							}
 							self::$pictures = $tempPictures;
 							self::$picturesId  = $tempPicturesId;
 						}
@@ -377,7 +394,7 @@ class gallery extends common {
 							self::$pictures[$directory . '/' . $fileInfos->getFilename()] = $this->getData(['module', $this->getUrl(0), $this->getUrl(1), 'legend', str_replace('.','',$fileInfos->getFilename())]);							
 							$picturesSort[$directory . '/' . $fileInfos->getFilename()] = $this->getData(['module', $this->getUrl(0), $this->getUrl(1), 'position', str_replace('.','',$fileInfos->getFilename())]);
 							// Créer la miniature si manquante
-							if (!file_exists( str_replace('source','thumb',$fileInfos->getPathname()) . '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()))) {
+							if (!file_exists( str_replace('source','thumb',$fileInfos->getPath()) . '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()))) {
 								$this->makeThumb($fileInfos->getPathname(),
 												str_replace('source','thumb',$fileInfos->getPath()) .  '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()),
 												self::THUMBS_WIDTH);
@@ -443,19 +460,32 @@ class gallery extends common {
 					$iterator = new DirectoryIterator($gallery['config']['directory']);
 					foreach($iterator as $fileInfos) {
 						if($fileInfos->isDot() === false AND $fileInfos->isFile() AND @getimagesize($fileInfos->getPathname())) {
+							
 							self::$galleries[$galleryId] = $gallery;
-							// Créer la miniature si manquante
-							if (!file_exists( str_replace('source','thumb',$gallery['config']['directory']) . '/' . self::THUMBS_SEPARATOR  . strtolower($gallery['config']['homePicture']))) {
-								$this->makeThumb($gallery['config']['directory'] . '/' . str_replace(self::THUMBS_SEPARATOR ,'',$gallery['config']['homePicture']),
-												str_replace('source','thumb',$gallery['config']['directory']) .  '/' . self::THUMBS_SEPARATOR  . strtolower($gallery['config']['homePicture']),
+							// L'image de couverture est-elle supprimée ?
+							if (file_exists( $gallery['config']['directory'] . '/' . $gallery['config']['homePicture'])) {
+								// Créer la miniature si manquante
+								if (!file_exists( str_replace('source','thumb',$gallery['config']['directory']) . '/' . self::THUMBS_SEPARATOR  . strtolower($gallery['config']['homePicture']))) {
+									$this->makeThumb($gallery['config']['directory'] . '/' . str_replace(self::THUMBS_SEPARATOR ,'',$gallery['config']['homePicture']),
+													str_replace('source','thumb',$gallery['config']['directory']) .  '/' . self::THUMBS_SEPARATOR  . strtolower($gallery['config']['homePicture']),
+													self::THUMBS_WIDTH);
+								}	
+								// Définir l'image de couverture
+								self::$firstPictures[$galleryId] =	file_exists( str_replace('source','thumb',$gallery['config']['directory']) . '/' . self::THUMBS_SEPARATOR  . strtolower($gallery['config']['homePicture']))
+																	? str_replace('source','thumb',$gallery['config']['directory']) . '/' . self::THUMBS_SEPARATOR .  strtolower($gallery['config']['homePicture'])
+																	: str_replace('source','thumb',$gallery['config']['directory']) . '/' .  strtolower($gallery['config']['homePicture']);
+							} else {							
+								// homePicture contient une image invalide, supprimée ou déplacée
+								// Définir l'image de couverture, première image disponible
+								$this->makeThumb($fileInfos->getPath() . '/' . $fileInfos->getFilename(),
+												str_replace('source','thumb',$fileInfos->getPath()) .  '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()),
 												self::THUMBS_WIDTH);
-							}	
-							// Définir l'image de couverture
-							self::$firstPictures[$galleryId] =	file_exists( str_replace('source','thumb',$gallery['config']['directory']) . '/' . self::THUMBS_SEPARATOR  . strtolower($gallery['config']['homePicture']))
-																? str_replace('source','thumb',$gallery['config']['directory']) . '/' . self::THUMBS_SEPARATOR .  strtolower($gallery['config']['homePicture'])
-																: str_replace('source','thumb',$gallery['config']['directory']) . '/' .  strtolower($gallery['config']['homePicture']);
-							continue(2);
-						}
+								self::$firstPictures[$galleryId] =	file_exists( str_replace('source','thumb',$fileInfos->getPath()) . '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()))
+																	? str_replace('source','thumb',$fileInfos->getPath()) . '/' . self::THUMBS_SEPARATOR .  strtolower($fileInfos->getFilename())
+																	: str_replace('source','thumb',$fileInfos->getPath()) . '/' .  strtolower($fileInfos->getFilename());
+							}
+						} 
+						continue(1);
 					}
 				}
 			}

@@ -37,10 +37,16 @@
 						<?php echo template::select('galleryEditSort', $module::$sort, [
 							'selected' => $this->getData(['module', $this->getUrl(0), $this->getUrl(2), 'config', 'sort']),
 							'label' => 'Tri des images',
-							'help' => 'Les images sont triées par nom de fichier grâce à la méthode naturelle qui donne de meilleurs résultats lorsque les images sont numérotées.<br>
-										N\'oubliez pas d\'enregistrer pour sauvegarder le tri manuel des images'
+							'help' => 'Les tris alphabétiques conviennent également aux images numérotées.<br>Cliquez sur \'Enregistrer\' pour valider le tri.'
 						]); ?>	
-					</div>				
+					</div>
+				<div clas="row">
+					<div class="col12">
+                        <?php echo template::checkbox('galleryEditFullscreen', true, 'Mode plein écran automatique' , [
+								'checked' => $this->getData(['module', $this->getUrl(0), $this->getUrl(2), 'config', 'fullScreen']),
+								'help' => 'A l\'ouverture de la galerie, la première image est affichée en plein écran.'
+                            ]); ?>  
+					</div>		
 				</div>
 				<div class="row">
 					<div class="col12">

@@ -8,26 +8,18 @@
  *
  * @author Rémi Jean <remi.jean@outlook.com>
  * @copyright Copyright (C) 2008-2018, Rémi Jean
+ * @author Frédéric Tempez <frederic.tempez@outlook.com>
+ * @copyright Copyright (C) 2018-2020, Frédéric Tempez
  * @license GNU General Public License, version 3
  * @link http://zwiicms.com/
  */
 
 class gallery extends common {
 
-	public static $actions = [
-		'config' => self::GROUP_MODERATOR,
-		'delete' => self::GROUP_MODERATOR,
-		'dirs' => self::GROUP_MODERATOR,
-		'sort' => self::GROUP_MODERATOR,
-		'edit' => self::GROUP_MODERATOR,
-		'index' => self::GROUP_VISITOR		
-	];
-
-	public static $sort = [
-		'SORT_ASC' => 'Alphabétique ',
-		'SORT_DSC' => 'Alphabétique inversé',
-		'SORT_HAND' => 'Tri manuel'
-	];
+	const SORT_ASC = 'SORT_ASC';
+	const SORT_DSC = 'SORT_DSC';
+	const SORT_HAND = 'SORT_HAND';
+	const GALLERY_VERSION = '2.19';		
 
 	public static $directories = [];
 
@@ -41,15 +33,104 @@ class gallery extends common {
 
 	public static $picturesId = [];
 
-	public static $thumbs = [];
+	public static $thumbs = [];	
 
-	const GALLERY_VERSION = '2.3';	
+	public static $actions = [
+		'config' => self::GROUP_MODERATOR,
+		'delete' => self::GROUP_MODERATOR,
+		'dirs' => self::GROUP_MODERATOR,
+		'sort' => self::GROUP_MODERATOR,
+		'edit' => self::GROUP_MODERATOR,
+		'theme' => self::GROUP_MODERATOR,
+		'index' => self::GROUP_VISITOR		
+	];
 
+	public static $sort = [
+		self::SORT_ASC  => 'Alphabétique ',
+		self::SORT_DSC  => 'Alphabétique inverse',
+		self::SORT_HAND => 'Manuel'
+	];
+
+	public static $galleryThemeFlexAlign = [
+		'flex-start' => 'À gauche',
+		'center' => 'Au centre',
+		'flex-end' => 'À droite',
+		'space-around' => 'Distribué avec marges',
+		'space-between' => 'Distribué sans marge',
+	];
+
+	public static $galleryThemeAlign = [
+		'left' => 'À gauche',
+		'center' => 'Au centre',
+		'right' => 'À droite'
+	];
+
+	public static $galleryThemeSize = [
+		'9em'  => 'Très petite',
+		'12em' => 'Petite',
+		'15em' => 'Moyenne',
+		'18em' => 'Grande',
+		'21em' => 'Très grande'
+	];
+
+	public static $galleryThemeLegendHeight = [
+		'.125em'  => 'Très petite',
+		'.25em'  => 'Petite',
+		'.375em'  => 'Moyenne',
+		'.5em'  => 'Grande',
+		'.625em' => 'Très grande'
+	];
+
+	public static $galleryThemeBorder = [
+		'0em' => 'Aucune',
+		'.1em' => 'Très fine',
+		'.3em' => 'Fine',
+		'.5em'  => 'Moyenne',
+		'.7em' => 'Epaisse',
+		'.9em'  => 'Epaisse'
+	];
+
+	public static $galleryThemeOpacity = [
+		'1'   => 'Aucun ',
+		'.9'  => 'Très Discrète',
+		'.8'  => 'Discrète',		
+		'.7'  => 'Moyenne',
+		'.6'  => 'Forte',
+		'.5'  => 'Très forte'
+	];
+
+	public static $galleryThemeMargin = [
+		'0em'    => 'Aucune',
+		'.1em'   => 'Très petite',
+		'.3em'   => 'Petite',
+		'.5em'   => 'Moyenne',
+		'.7em'  => 'Grande',
+		'.9em'  => 'Très grande'
+	];
+
+	public static $galleryThemeRadius = [
+		'0em' => 'Aucun',
+		'.3em' => 'Très léger',
+		'.6em' => 'Léger',
+		'.9em' => 'Moyen',
+		'1.2em' => 'Important',
+		'1.5em' => 'Très important'
+	];
+
+	public static $galleryThemeShadows = [
+		'0px' => 'Aucune',
+		'1px 1px 5px' => 'Très légère',
+		'1px 1px 10px' => 'Légère',
+		'1px 1px 15px' => 'Moyenne',
+		'1px 1px 25px' => 'Importante',
+		'1px 1px 50px' => 'Très importante'
+	];
 
 	/**
-	 * Tri sans bouton
+	 * Tri de la liste des galeries
+	 *
 	 */
-	public function sort () {
+	private function sort () {
 		if($_POST['response']) {
 			$data = explode('&',$_POST['response']);
 			$data = str_replace('galleryTable%5B%5D=','',$data);
@@ -60,9 +141,12 @@ class gallery extends common {
 						'directory' => $this->getData(['module',$this->getUrl(0),$data[$i],'config','directory']),
 						'homePicture' => $this->getData(['module',$this->getUrl(0),$data[$i],'config','homePicture']),
 						'sort' => $this->getData(['module',$this->getUrl(0),$data[$i],'config','sort']),
-						'position' => $i
+						'position' => $i,
+						'fullScreen' => $this->getData(['module',$this->getUrl(0),$data[$i],'config','fullScreen'])
+
 					],
-					'legend' => $this->getData(['module',$this->getUrl(0),$data[$i],'legend'])
+					'legend' => $this->getData(['module',$this->getUrl(0),$data[$i],'legend']),
+					'position' => $this->getData(['module',$this->getUrl(0),$data[$i],'position'])
 				]]);
 			}	
 		}
@@ -123,15 +207,13 @@ class gallery extends common {
 				foreach($iterator as $fileInfos) {
 					if($fileInfos->isDot() === false AND $fileInfos->isFile() AND @getimagesize($fileInfos->getPathname())) {						
 						// Créer la miniature si manquante
-						if (!file_exists( str_replace('source','thumb',$fileInfos->getPathname()) . '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()))) {
+						if (!file_exists( str_replace('source','thumb',$fileInfos->getPath()) . '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()))) {
 							$this->makeThumb($fileInfos->getPathname(),
 											str_replace('source','thumb',$fileInfos->getPath()) .  '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()),
 											self::THUMBS_WIDTH);
 						}
 						// Miniatures 
-						$homePicture = file_exists( str_replace('source','thumb',$directory) . '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename())) 
-							?  self::THUMBS_SEPARATOR .  strtolower($fileInfos->getFilename())
-							:  strtolower($fileInfos->getFilename());
+						$homePicture = strtolower($fileInfos->getFilename());
 					break;
 					}
 				}
@@ -140,8 +222,9 @@ class gallery extends common {
 						'name' => $this->getInput('galleryConfigName'),
 						'directory' => $this->getInput('galleryConfigDirectory', helper::FILTER_STRING_SHORT, true),
 						'homePicture' => $homePicture,
-						'sort' => $this->getInput('galleryConfigSort'),
-						'position' => count($this->getData(['module',$this->getUrl(0)])) + 1
+						'sort' => self::SORT_ASC,
+						'position' => $this->getData(['module',$this->getUrl(0)]) !== null ? count($this->getData(['module',$this->getUrl(0)])) + 1 : 0,
+						'fullScreen' => false
 					],
 					'legend' => [],
 					'position' => []
@@ -231,15 +314,21 @@ class gallery extends common {
 			// Soumission du formulaire
 			if($this->isPost()) {
 				/**
-				 * $picturesPosition contien un tableau avec les images triées
+				 * $picturesPosition contient un tableau avec les images triées
 				 */
 				$picturesPosition = [];
 				if ($this->getInput('galleryEditFormResponse') &&
-					$this->getInput('galleryEditSort') === 'SORT_HAND') {
+					$this->getInput('galleryEditSort') === self::SORT_HAND) {
 					// Tri des images si valeur de retour et choix manuel
 					$picturesPosition = explode('&',($this->getInput('galleryEditFormResponse')));
 					$picturesPosition = str_replace('galleryTable%5B%5D=','',$picturesPosition);	
 					$picturesPosition = array_flip($picturesPosition);				
+				}
+				// Tri manuel sélectionné mais de déplacement, reprendre la config sauvegardée
+				if ($this->getInput('galleryEditSort') === self::SORT_HAND &&
+				   empty($picturesPosition)) {
+					$picturesPosition  = $this->getdata(['module', $this->getUrl(0), $this->getUrl(2), 'position']);
+					// Si la position sauvegardée est vide, on activera le tri alpha
 				}
 				// Si l'id a changée
 				$galleryId = $this->getInput('galleryEditName', helper::FILTER_ID, true);
@@ -252,19 +341,28 @@ class gallery extends common {
 				// légendes
 				$legends = [];
 				foreach((array) $this->getInput('legend', null) as $file => $legend) {
+					// Image de couverure par défaut si non définie
+					$homePicture = $file;
 					$file = str_replace('.','',$file);
 					$legends[$file] = helper::filter($legend, helper::FILTER_STRING_SHORT);
+
 				}
-				// Photo de la page de garde de l'album
-				$homePicture = array_keys($this->getInput('homePicture', null));
+				// Photo de la page de garde de l'album définie dans form
+				if (is_array($this->getInput('homePicture', null)) ) {
+					$d = array_keys($this->getInput('homePicture', null));
+					$homePicture = $d[0];
+				}
 				// Sauvegarder
 				$this->setData(['module', $this->getUrl(0), $galleryId, [
 					'config' => [
 						'name' => $this->getInput('galleryEditName', helper::FILTER_STRING_SHORT, true),
 						'directory' => $this->getInput('galleryEditDirectory', helper::FILTER_STRING_SHORT, true),
-						'homePicture' => $homePicture[0] === null ? $this->getData(['module', $this->getUrl(0), $galleryId,'config','homePicture']) : $homePicture[0] ,
-						'sort' =>  $this->getInput('galleryEditSort'),
-						'position' => $this->getData(['module', $this->getUrl(0), $galleryId,'config','position']) === '' ? count($this->getData(['module',$this->getUrl(0)]))-1 : $this->getData(['module', $this->getUrl(0), $galleryId,'config','position'])
+						'homePicture' => $homePicture,
+						// pas de positions, on active le tri alpha
+						'sort' =>  (empty($picturesPosition) && $this->getInput('galleryEditSort') === self::SORT_HAND) ? self::SORT_ASC : $this->getInput('galleryEditSort'),
+						'position' => $this->getData(['module', $this->getUrl(0), $galleryId,'config','position']) === '' ? count($this->getData(['module',$this->getUrl(0)]))-1 : $this->getData(['module', $this->getUrl(0), $galleryId,'config','position']),
+						'fullScreen' => $this->getInput('galleryEditFullscreen', helper::FILTER_BOOLEAN)
+
 					],
 					'legend' => $legends,
 					'position' => $picturesPosition
@@ -283,11 +381,11 @@ class gallery extends common {
 				
 				foreach($iterator as $fileInfos) {
 					if($fileInfos->isDot() === false AND $fileInfos->isFile() AND @getimagesize($fileInfos->getPathname())) {
-						// Créer la miniature si manquante
-						if (!file_exists( str_replace('source','thumb',$fileInfos->getPathname()) . '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()))) {
+						// Créer la miniature RFM si manquante
+						if (!file_exists( str_replace('source','thumb',$fileInfos->getPath()) . '/' . strtolower($fileInfos->getFilename()))) {
 							$this->makeThumb($fileInfos->getPathname(),
-											str_replace('source','thumb',$fileInfos->getPath()) .  '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()),
-											self::THUMBS_WIDTH);
+											str_replace('source','thumb',$fileInfos->getPath()) .  '/' .  strtolower($fileInfos->getFilename()),
+											122);
 						}
 						self::$pictures[str_replace('.','',$fileInfos->getFilename())] = [								
 							template::ico('sort'),
@@ -299,29 +397,38 @@ class gallery extends common {
 							template::text('legend[' . $fileInfos->getFilename() . ']', [
 								'value' => $this->getData(['module', $this->getUrl(0), $this->getUrl(2), 'legend', str_replace('.','',$fileInfos->getFilename())])
 							]),
-							'<a href="' .  $fileInfos->getPathname() .'" rel="data-lity" data-lity=""><img src="'. str_replace('source','thumb',$directory) . '/' . $fileInfos->getFilename() .  '"></a>'
+							'<a href="' . str_replace('source','thumb',$directory) . '/' . self::THUMBS_SEPARATOR . $fileInfos->getFilename() .'" rel="data-lity" data-lity=""><img src="'. str_replace('source','thumb',$directory) . '/' . $fileInfos->getFilename() .  '"></a>'
 						];
 						self::$picturesId [] = str_replace('.','',$fileInfos->getFilename());
 					}
 				}
 				// Tri des images 		
 				switch ($this->getData(['module', $this->getUrl(0), $this->getUrl(2), 'config', 'sort'])) {
-					case 'SORT_HAND':
+					case self::SORT_HAND:
 						$positions = $this->getdata(['module',$this->getUrl(0), $this->getUrl(2),'position']);
 						if ($positions) {
-							foreach ($positions as $position => $name) {
-								$tempPictures [] = self::$pictures[$position];							
-								$tempPicturesId [] = $position;																
-							}							
+							foreach ($positions as $key => $value) {
+								if (array_key_exists($key,self::$pictures)) {
+									$tempPictures[$key] = self::$pictures[$key];
+									$tempPicturesId [] = $key;
+								}
+							}	
+							// Images ayant été ajoutées dans le dossier mais non triées
+							foreach (self::$pictures as $key => $value) {
+								if (!array_key_exists($key,$tempPictures)) {
+									$tempPictures[$key] = self::$pictures[$key];
+									$tempPicturesId [] = $key;
+								}
+							}
 							self::$pictures = $tempPictures;
 							self::$picturesId  = $tempPicturesId;
 						}
 						break;
-					case 'SORT_ASC':
+					case self::SORT_ASC:
 						ksort(self::$pictures,SORT_NATURAL);
 						sort(self::$picturesId,SORT_NATURAL);
 						break;						
-					case 'SORT_DSC':
+					case self::SORT_DSC:
 						krsort(self::$pictures,SORT_NATURAL);
 						rsort(self::$picturesId,SORT_NATURAL);
 						break;													
@@ -362,7 +469,7 @@ class gallery extends common {
 							self::$pictures[$directory . '/' . $fileInfos->getFilename()] = $this->getData(['module', $this->getUrl(0), $this->getUrl(1), 'legend', str_replace('.','',$fileInfos->getFilename())]);							
 							$picturesSort[$directory . '/' . $fileInfos->getFilename()] = $this->getData(['module', $this->getUrl(0), $this->getUrl(1), 'position', str_replace('.','',$fileInfos->getFilename())]);
 							// Créer la miniature si manquante
-							if (!file_exists( str_replace('source','thumb',$fileInfos->getPathname()) . '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()))) {
+							if (!file_exists( str_replace('source','thumb',$fileInfos->getPath()) . '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()))) {
 								$this->makeThumb($fileInfos->getPathname(),
 												str_replace('source','thumb',$fileInfos->getPath()) .  '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()),
 												self::THUMBS_WIDTH);
@@ -375,7 +482,7 @@ class gallery extends common {
 					}
 					// Tri des images par ordre alphabétique
 					switch ($this->getData(['module', $this->getUrl(0), $this->getUrl(1), 'config', 'sort'])) {
-						case 'SORT_HAND':
+						case self::SORT_HAND:
 							asort($picturesSort);
 							if ($picturesSort) {
 								foreach ($picturesSort as $name => $position) {
@@ -384,10 +491,10 @@ class gallery extends common {
 								self::$pictures = $temp;
 								break;
 							}
-						case 'SORT_DSC':
+						case self::SORT_DSC:
 							krsort(self::$pictures,SORT_NATURAL);
 							break;													
-						case 'SORT_ASC':
+						case self::SORT_ASC:
 						default:
 							ksort(self::$pictures,SORT_NATURAL);
 							break;
@@ -428,19 +535,32 @@ class gallery extends common {
 					$iterator = new DirectoryIterator($gallery['config']['directory']);
 					foreach($iterator as $fileInfos) {
 						if($fileInfos->isDot() === false AND $fileInfos->isFile() AND @getimagesize($fileInfos->getPathname())) {
+							
 							self::$galleries[$galleryId] = $gallery;
-							// Créer la miniature si manquante
-							if (!file_exists( str_replace('source','thumb',$fileInfos->getPathname()) . '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()))) {
-								$this->makeThumb($fileInfos->getPathname(),
+							// L'image de couverture est-elle supprimée ?
+							if (file_exists( $gallery['config']['directory'] . '/' . $gallery['config']['homePicture'])) {
+								// Créer la miniature si manquante
+								if (!file_exists( str_replace('source','thumb',$gallery['config']['directory']) . '/' . self::THUMBS_SEPARATOR  . strtolower($gallery['config']['homePicture']))) {
+									$this->makeThumb($gallery['config']['directory'] . '/' . str_replace(self::THUMBS_SEPARATOR ,'',$gallery['config']['homePicture']),
+													str_replace('source','thumb',$gallery['config']['directory']) .  '/' . self::THUMBS_SEPARATOR  . strtolower($gallery['config']['homePicture']),
+													self::THUMBS_WIDTH);
+								}	
+								// Définir l'image de couverture
+								self::$firstPictures[$galleryId] =	file_exists( str_replace('source','thumb',$gallery['config']['directory']) . '/' . self::THUMBS_SEPARATOR  . strtolower($gallery['config']['homePicture']))
+																	? str_replace('source','thumb',$gallery['config']['directory']) . '/' . self::THUMBS_SEPARATOR .  strtolower($gallery['config']['homePicture'])
+																	: str_replace('source','thumb',$gallery['config']['directory']) . '/' .  strtolower($gallery['config']['homePicture']);
+							} else {							
+								// homePicture contient une image invalide, supprimée ou déplacée
+								// Définir l'image de couverture, première image disponible
+								$this->makeThumb($fileInfos->getPath() . '/' . $fileInfos->getFilename(),
 												str_replace('source','thumb',$fileInfos->getPath()) .  '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()),
 												self::THUMBS_WIDTH);
-							}	
-							// Définir l'image de couverture
-							self::$firstPictures[$galleryId] =	file_exists( str_replace('source','thumb',$gallery['config']['directory']) . '/' . self::THUMBS_SEPARATOR  . $gallery['config']['homePicture'])
-																? str_replace('source','thumb',$gallery['config']['directory']) . '/' . self::THUMBS_SEPARATOR .  strtolower($gallery['config']['homePicture'])
-																: str_replace('source','thumb',$gallery['config']['directory']) . '/' .  strtolower($gallery['config']['homePicture']);
-							continue(2);
-						}
+								self::$firstPictures[$galleryId] =	file_exists( str_replace('source','thumb',$fileInfos->getPath()) . '/' . self::THUMBS_SEPARATOR  . strtolower($fileInfos->getFilename()))
+																	? str_replace('source','thumb',$fileInfos->getPath()) . '/' . self::THUMBS_SEPARATOR .  strtolower($fileInfos->getFilename())
+																	: str_replace('source','thumb',$fileInfos->getPath()) . '/' .  strtolower($fileInfos->getFilename());
+							}
+						} 
+						continue(1);
 					}
 				}
 			}
@@ -451,6 +571,81 @@ class gallery extends common {
 				'view' => 'index'
 			]);
 		}
+	}
+
+	/**
+	 * Thème de la galerie
+	 */
+	public function theme() {
+		// Jeton incorrect
+		if ($this->getUrl(2) !== $_SESSION['csrf']) {
+			// Valeurs en sortie
+			$this->addOutput([
+				'redirect' => helper::baseUrl() . $this->getUrl(0) . '/config',
+				'notification' => 'Action  non autorisée'
+			]);
+		}
+		// Initialisation des données de thème de la galerie dasn theme.json
+		// Création des valeur par défaut absentes
+		if ( $this->getData(['theme', $this->getUrl(0)]) === null ) {
+			require_once('module/gallery/ressource/defaultdata.php'); 
+			$this->setData(['theme', $this->getUrl(0), theme::$defaultData]);
+		}
+		// Soumission du formulaire
+
+		if($this->isPost()) {
+			$this->setData(['theme', $this->getUrl(0), [
+					'thumbAlign' 	    => $this->getinput('galleryThemeThumbAlign'),
+					'thumbWidth' 	    => $this->getinput('galleryThemeThumbWidth'),
+					'thumbHeight'	    => $this->getinput('galleryThemeThumbHeight'),
+					'thumbMargin'	    => $this->getinput('galleryThemeThumbMargin'),
+					'thumbBorder'	    => $this->getinput('galleryThemeThumbBorder'),
+					'thumbBorderColor'  => $this->getinput('galleryThemeThumbBorderColor'),
+					'thumbOpacity'	    => $this->getinput('galleryThemeThumbOpacity'),
+					'thumbShadows'   	=> $this->getinput('galleryThemeThumbShadows'),
+					'thumbShadowsColor' => $this->getinput('galleryThemeThumbShadowsColor'),
+					'thumbRadius'	    => $this->getinput('galleryThemeThumbRadius'),
+					'legendHeight'	    => $this->getinput('galleryThemeLegendHeight'),
+					'legendAlign'	    => $this->getinput('galleryThemeLegendAlign'),
+					'legendTextColor'   => $this->getinput('galleryThemeLegendTextColor'),
+					'legendBgColor'	    => $this->getinput('galleryThemeLegendBgColor')
+				]
+			]);
+			// Création des fichiers CSS
+			$content = file_get_contents('module/gallery/ressource/vartheme.css');
+			$themeCss = file_get_contents('module/gallery/ressource/theme.css');
+			// Injection des variables			
+			$content = str_replace('#thumbAlign#',$this->getinput('galleryThemeThumbAlign'),$content );			
+			$content = str_replace('#thumbWidth#',$this->getinput('galleryThemeThumbWidth'),$content );
+			$content = str_replace('#thumbHeight#',$this->getinput('galleryThemeThumbHeight'),$content );
+			$content = str_replace('#thumbMargin#',$this->getinput('galleryThemeThumbMargin'),$content );
+			$content = str_replace('#thumbBorder#',$this->getinput('galleryThemeThumbBorder'),$content );
+			$content = str_replace('#thumbBorderColor#',$this->getinput('galleryThemeThumbBorderColor'),$content );
+			$content = str_replace('#thumbOpacity#',$this->getinput('galleryThemeThumbOpacity'),$content );
+			$content = str_replace('#thumbShadows#',$this->getinput('galleryThemeThumbShadows'),$content );
+			$content = str_replace('#thumbShadowsColor#',$this->getinput('galleryThemeThumbShadowsColor'),$content );
+			$content = str_replace('#thumbRadius#',$this->getinput('galleryThemeThumbRadius'),$content );			
+			$content = str_replace('#legendAlign#',$this->getinput('galleryThemeLegendAlign'),$content );			
+			$content = str_replace('#legendHeight#',$this->getinput('galleryThemeLegendHeight'),$content );
+			$content = str_replace('#legendTextColor#',$this->getinput('galleryThemeLegendTextColor'),$content );
+			$content = str_replace('#legendBgColor#',$this->getinput('galleryThemeLegendBgColor'),$content );
+			$success = file_put_contents('module/gallery/view/index/index.css',$content . $themeCss);
+			$success = $success && file_put_contents('module/gallery/view/gallery/gallery.css',$content . $themeCss);
+			// Valeurs en sortie				
+			$this->addOutput([
+				'redirect' => helper::baseUrl() . $this->getUrl() . '/theme',
+				'notification' => $success ? 'Modifications enregistrées' : 'Modifications non enregistées !',
+				'state' => $success
+			]);
+		}
+		// Valeurs en sortie
+		$this->addOutput([
+			'title' => "Thème",
+			'view' => 'theme',
+			'vendor' => [
+				'tinycolorpicker'
+			]
+		]);
 	}
 
 }

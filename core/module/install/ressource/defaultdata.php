@@ -27,7 +27,7 @@ class init extends common {
 			'proxyType' => "tcp://",
 			'editing' => false,
 			'editingCsrf' => '',
-			'editingTime' => 0	
+			'editingTimer' => 0	
 		],
 		'core' => [
 			'dataVersion' => 10000,
@@ -65,7 +65,7 @@ class init extends common {
 			'hideMenuChildren' =>false,
 			'editing' => false,
 			'editingCsrf' => '',
-			'editingTime' => 0	
+			'editingTimer' => 0	
 			]
 		],
 		'module' => [],
@@ -167,7 +167,7 @@ class init extends common {
 			'version' => 0,
 			'editing' => false,
 			'editingCsrf' => '',
-			'editingTime' => 0	
+			'editingTimer' => 0	
 		]
     ];
 
@@ -202,7 +202,7 @@ class init extends common {
 			'hideMenuChildren' =>false,
 			'editing' => false,
 			'editingCsrf' => '',
-			'editingTime' => 0	
+			'editingTimer' => 0	
 			],
 			'enfant' => [
 					'typeMenu' => 'text',
@@ -233,7 +233,7 @@ class init extends common {
 				'hideMenuChildren' =>false,
 				'editing' => false,
 				'editingCsrf' => '',
-				'editingTime' => 0	
+				'editingTimer' => 0	
 			],
 			'privee' => [
 					'typeMenu' => 'text',
@@ -263,7 +263,7 @@ class init extends common {
 				'hideMenuChildren' =>false,
 				'editing' => false,
 				'editingCsrf' => '',
-				'editingTime' => 0	
+				'editingTimer' => 0	
 			],
 			'mise-en-page' => [
 				'typeMenu' => 'text',
@@ -292,7 +292,7 @@ class init extends common {
 				'hideMenuChildren' =>false,
 				'editing' => false,
 				'editingCsrf' => '',
-				'editingTime' => 0	
+				'editingTimer' => 0	
 			],
 			'menu-lateral' => [
 				'typeMenu' => 'text',
@@ -320,7 +320,7 @@ class init extends common {
 				'hideMenuChildren' =>false,
 				'editing' => false,
 				'editingCsrf' => '',
-				'editingTime' => 0	
+				'editingTimer' => 0	
 				],				
 			'blog' => [
 				'typeMenu' => 'text',
@@ -346,7 +346,7 @@ class init extends common {
 				'hideMenuChildren' =>false,
 				'editing' => false,
 				'editingCsrf' => '',
-				'editingTime' => 0	
+				'editingTimer' => 0	
 			],
 			'galeries' => [
 				'typeMenu' => 'text',
@@ -372,7 +372,7 @@ class init extends common {
 				'hideMenuChildren' =>false,
 				'editing' => false,
 				'editingCsrf' => '',
-				'editingTime' => 0	
+				'editingTimer' => 0	
 			],
 			'site-de-zwii' => [
 			'typeMenu' => 'text',
@@ -399,7 +399,7 @@ class init extends common {
 			'hideMenuChildren' =>false,
 			'editing' => false,
 			'editingCsrf' => '',
-			'editingTime' => 0	
+			'editingTimer' => 0	
 			],
 			'contact' => [
 				'typeMenu' => 'text',
@@ -425,7 +425,7 @@ class init extends common {
 				'hideMenuChildren' =>false,
 				'editing' => false,
 				'editingCsrf' => '',
-				'editingTime' => 0	
+				'editingTimer' => 0	
 			],
 			'barre' => [
 				'typeMenu' => 'text',
@@ -451,7 +451,7 @@ class init extends common {
 				'hideMenuChildren' =>false,
 				'editing' => false,
 				'editingCsrf' => '',
-				'editingTime' => 0	
+				'editingTimer' => 0	
 			],
 			'barrelateraleavecmenu' => [
 				'typeMenu' => 'text',
@@ -477,7 +477,7 @@ class init extends common {
 				'hideMenuChildren' =>false,
 				'editing' => false,
 				'editingCsrf' => '',
-				'editingTime' => 0	
+				'editingTimer' => 0	
 			],
 			'mentions-legales' => [
 				'typeMenu' => 'text',
@@ -506,7 +506,7 @@ class init extends common {
 				'hideMenuChildren' => false,
 				'editing' => false,
 				'editingCsrf' => '',
-				'editingTime' => 0	
+				'editingTimer' => 0	
 			],
 			'mentions-legales' => [
 				'typeMenu' => 'text',
@@ -533,7 +533,7 @@ class init extends common {
 				'hideMenuChildren' => false,
 				'editing' => false,
 				'editingCsrf' => '',
-				'editingTime' => 0	
+				'editingTimer' => 0	
 			],
 		],
 		'module' => [

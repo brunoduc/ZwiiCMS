@@ -68,8 +68,10 @@ class user extends common {
 						'mail' => $userMail,
 						'password' => $this->getInput('userAddPassword', helper::FILTER_PASSWORD, true),
 						'editing' => false,
-						'editingTime' => 0,
+						'editingTimer' => 0,
 						'editingCsrf' => '',
+						'connected' =>  false,
+						'connectedTimer' => 0,
 					]
 				]);
 			}
@@ -225,8 +227,10 @@ class user extends common {
 						'mail' => $this->getInput('userEditMail', helper::FILTER_MAIL, true),
 						'password' => $newPassword,
 						'editing' => false,
-						'editingTime' => 0,
-						'editingCsrf' => ''
+						'editingTimer' => 0,
+						'editingCsrf' => '',
+						'connected' => $this->getData([['user', $this->getUrl(2), 'connected']]) !== null ?  $this->getData([['user', $this->getUrl(2), 'connected']]) : false,
+						'connectedTimer' => $this->getData([['user', $this->getUrl(2), 'connected']]) !== null ? $this->getData([['user', $this->getUrl(2), 'connectedTimer']]) : 0,
 					]
 				]);
 				// Redirection spécifique si l'utilisateur change son mot de passe
@@ -249,7 +253,7 @@ class user extends common {
 				]);
 			}
 			if($this->getData(['user', $this->getUrl(2),'editing']) === true
-				&& time() - $this->getData(['user',$this->getUrl(2),'editingTime']) < 120 ){
+				&& time() - $this->getData(['user',$this->getUrl(2),'editingTimer']) < 120 ){
 				// Valeurs en sortie
 				$this->addOutput([
 					'redirect' => helper::baseUrl().'user',
@@ -260,7 +264,7 @@ class user extends common {
 			}
 			else{
 				$this->setData(['user', $this->getUrl(2), 'editing',true]);
-				$this->setData(['user', $this->getUrl(2), 'editingTime',time()]);
+				$this->setData(['user', $this->getUrl(2), 'editingTimer',time()]);
 				$this->setData(['user', $this->getUrl(2), 'editingCsrf', $_SESSION['csrf']]);
 				// Valeurs en sortie
 				$this->addOutput([

@@ -1442,7 +1442,7 @@ class core extends common {
 			($this->getUrl(1) === null || 
 			$this->getUrl(1) == 'logout' )){
 				$this->setData(['page', $pageId, 'editing', false]);
-				$this->setData(['page', $pageId, 'editingTime', 0]);
+				$this->setData(['page', $pageId, 'editingTimer', 0]);
 				$this->setData(['page', $pageId, 'editingCsrf', '']);
 		}
 	 }
@@ -1457,24 +1457,24 @@ class core extends common {
 		if(strpos($_SERVER['QUERY_STRING'], 'modifeditingtime') !== false){
 			foreach($this->getHierarchy(null,false,null) as $parentId => $childIds){
 				if($this->getData(['page', $parentId, 'editingCsrf']) == $_SESSION['csrf']){
-						$this->setData(['page', $parentId, 'editingTime', $this->getData(['page', $parentId, 'editingTime']) + 60]);
+						$this->setData(['page', $parentId, 'editingTimer', $this->getData(['page', $parentId, 'editingTimer']) + 60]);
 				}
 				foreach($childIds as $childId) {
 					if($this->getData(['page', $childId, 'editingCsrf']) == $_SESSION['csrf']){
-							$this->setData(['page', $childId, 'editingTime', $this->getData(['page', $childId, 'editingTime']) + 60]);
+							$this->setData(['page', $childId, 'editingTimer', $this->getData(['page', $childId, 'editingTimer']) + 60]);
 					}		
 				}
 			}
 			foreach($this->getData(['user']) as $userId => $userIds){
 				if($this->getData(['user', $userId, 'editingCsrf']) == $_SESSION['csrf']){
-					$this->setData(['user', $userId, 'editingTime', $this->getData(['user', $userId, 'editingTime']) + 60]);
+					$this->setData(['user', $userId, 'editingTimer', $this->getData(['user', $userId, 'editingTimer']) + 60]);
 				}
 			}
 			if($this->getData(['theme', 'editingCsrf']) == $_SESSION['csrf']){
-				$this->setData(['theme', 'editingTime', $this->getData(['theme','editingTime']) + 60]);
+				$this->setData(['theme', 'editingTimer', $this->getData(['theme','editingTimer']) + 60]);
 			}
 			if($this->getData(['config', 'editingCsrf']) == $_SESSION['csrf']){
-				$this->setData(['config', 'editingTime', $this->getData(['config','editingTime']) + 60]);
+				$this->setData(['config', 'editingTimer', $this->getData(['config','editingTimer']) + 60]);
 			}
 			exit();
 		}
@@ -1485,7 +1485,7 @@ class core extends common {
 			if($this->getData(['user', $userId, 'editingCsrf']) == $_SESSION['csrf'] && ($this->getUrl(1) === null || $this->getUrl(1) == 'logout' )){
 				$this->setData(['user', $userId, 'editing',false]);
 				$this->setData(['user', $userId, 'editingCsrf','']);
-				$this->setData(['user', $userId, 'editingTime',0]);
+				$this->setData(['user', $userId, 'editingTimer',0]);
 			}
 		}
 		
@@ -1494,7 +1494,7 @@ class core extends common {
 		if($this->getData(['theme', 'editingCsrf']) == $_SESSION['csrf'] && ($this->getUrl(1) === null || $this->getUrl(1) == 'logout' )){
 			$this->setData(['theme', 'editing',false]);
 			$this->setData(['theme', 'editingCsrf','']);
-			$this->setData(['theme', 'editingTime',0]);
+			$this->setData(['theme', 'editingTimer',0]);
 		}
 		
 		/* Verrou sur la configuration du site 
@@ -1502,7 +1502,7 @@ class core extends common {
 		if($this->getData(['config', 'editingCsrf']) == $_SESSION['csrf'] && ($this->getUrl(1) === null || $this->getUrl(1) == 'logout' )){
 			$this->setData(['config', 'editing',false]);
 			$this->setData(['config', 'editingCsrf','']);
-			$this->setData(['config', 'editingTime',0]);
+			$this->setData(['config', 'editingTimer',0]);
 		}
 		
 		// Verrou sur les pages, pages enfant et barres latérales	

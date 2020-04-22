@@ -83,7 +83,7 @@ class install extends common {
 						'mail' => $userMail,
 						'password' => $this->getInput('installPassword', helper::FILTER_PASSWORD, true),
 						'editing' => false,
-						'editingTime' => 0,
+						'editingTimer' => 0,
 						'editingCsrf' => ''
 					]
 				]);

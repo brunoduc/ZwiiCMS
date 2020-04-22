@@ -1514,7 +1514,8 @@ class core extends common {
 				$this->resetAccessToken($childId);
 			}
 		}
-		//-------------- FIN ACCESS CONCURRENTS --------------------------------------
+
+		//-------------- FIN ACCESS CONCURRENTS --------------------------------------		
 		// Installation
 		if(
 			$this->getData(['user']) === []
@@ -1531,6 +1532,16 @@ class core extends common {
 		) {
 			$user = new user;
 			$user->logout();
+
+		}
+		// Forcer la déconnexion des comptes restés ouverts	
+		if (
+			$this->getUser('password') === $this->getInput('ZWII_USER_PASSWORD')&&
+			$this->getUser('connectedCsrf') !== $_SESSION['csrf'] 
+		) {
+			$user = new user;
+			$user->logout();		
+			
 		}
 		// Mode maintenance
 		if(
@@ -2349,7 +2360,7 @@ class layout extends common {
 			$notification = common::$importNotices [0];
 			$notificationClass = 'notificationSuccess';
 		}
-		if(common::$inputNotices) {
+		if (common::$inputNotices) {
 			$notification = 'Impossible de soumettre le formulaire, car il contient des erreurs';
 			$notificationClass = 'notificationError';
 		}
@@ -2358,7 +2369,7 @@ class layout extends common {
 			foreach (common::$coreNotices as $item) $notification .= $item . ' | ';
 			$notificationClass = 'notificationError';
 		}
-		if(common::$inputNotices) {
+		if (common::$inputNotices) {
 			$notification = 'Impossible de soumettre le formulaire, car il contient des erreurs';
 			$notificationClass = 'notificationError';
 		}

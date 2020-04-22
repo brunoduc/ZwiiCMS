@@ -70,7 +70,6 @@ class user extends common {
 						'editing' => false,
 						'editingTimer' => 0,
 						'editingCsrf' => '',
-						'connected' =>  false,
 						'connectedTimer' => 0,
 					]
 				]);
@@ -229,8 +228,7 @@ class user extends common {
 						'editing' => false,
 						'editingTimer' => 0,
 						'editingCsrf' => '',
-						'connected' => $this->getData([['user', $this->getUrl(2), 'connected']]) !== null ?  $this->getData([['user', $this->getUrl(2), 'connected']]) : false,
-						'connectedTimer' => $this->getData([['user', $this->getUrl(2), 'connected']]) !== null ? $this->getData([['user', $this->getUrl(2), 'connectedTimer']]) : 0,
+						'connectedCsrf' => $this->getData([['user', $this->getUrl(2), 'connectedCsrf']]) !== null ? $this->getData([['user', $this->getUrl(2), 'connectedCsrf']]) : $_SESSION['csrf']
 					]
 				]);
 				// Redirection spécifique si l'utilisateur change son mot de passe
@@ -363,6 +361,8 @@ class user extends common {
 				AND $this->getData(['user', $userId, 'group']) >= self::GROUP_MEMBER
 			) {
 				$expire = $this->getInput('userLoginLongTime') ? strtotime("+1 year") : 0;
+				// Verrou de connexion					
+				$this->setData([ 'user', $userId, 'connectedCsrf', $_SESSION['csrf'] ]);
 				setcookie('ZWII_USER_ID', $userId, $expire, helper::baseUrl(false, false));
 				setcookie('ZWII_USER_PASSWORD', $this->getData(['user', $userId, 'password']), $expire, helper::baseUrl(false, false));
 				// Valeurs en sortie lorsque le site est en maintenance et que l'utilisateur n'est pas administrateur
@@ -370,16 +370,16 @@ class user extends common {
 					$this->getData(['config', 'maintenance'])
 					AND $this->getData(['user', $userId, 'group']) < self::GROUP_ADMIN
 				) {
+						$this->addOutput([
+							'notification' => 'Seul un administrateur peut se connecter lors d\'une maintenance',
+							'redirect' => helper::baseUrl(),
+							'state' => false
+						]);
+					}
+					// Valeurs en sortie en cas de réussite
+					else {
 					$this->addOutput([
-						'notification' => 'Seul un administrateur peut se connecter lors d\'une maintenance',
-						'redirect' => helper::baseUrl(),
-						'state' => false
-					]);
-				}
-				// Valeurs en sortie en cas de réussite
-				else {
-					$this->addOutput([
-						'notification' => 'Connexion réussie',
+						'notification' => 'Connexion réussie' . $notification,
 						'redirect' => helper::baseUrl() . str_replace('_', '/', str_replace('__', '#', $this->getUrl(2))),
 						'state' => true
 					]);
@@ -405,6 +405,7 @@ class user extends common {
 	 * Déconnexion
 	 */
 	public function logout() {
+		// Netoyer les cookies		
 		helper::deleteCookie('ZWII_USER_ID');
 		helper::deleteCookie('ZWII_USER_PASSWORD');
 		session_destroy();

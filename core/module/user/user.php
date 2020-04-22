@@ -248,9 +248,8 @@ class user extends common {
 					'state' => true
 				]);
 			}
-			$userIdent = $this->getUrl(2);
-			if($this->getData(['user', $userIdent,'editing']) === true
-				&& time() - $this->getData(['user', $userIdent,'editing_time']) < 120 ){
+			if($this->getData(['user', $this->getUrl(2),'editing']) === true
+				&& time() - $this->getData(['user',$this->getUrl(2),'editing_time']) < 120 ){
 				// Valeurs en sortie
 				$this->addOutput([
 					'redirect' => helper::baseUrl().'user',
@@ -260,9 +259,9 @@ class user extends common {
 			
 			}
 			else{
-				$this->setData(['user', $userIdent, 'editing',true]);
-				$this->setData(['user', $userIdent, 'editing_time',time()]);
-				$this->setData(['user', $userIdent, 'editing_csrf', $_SESSION['csrf']]);
+				$this->setData(['user', $this->getUrl(2), 'editing',true]);
+				$this->setData(['user', $this->getUrl(2), 'editing_time',time()]);
+				$this->setData(['user', $this->getUrl(2), 'editing_csrf', $_SESSION['csrf']]);
 				// Valeurs en sortie
 				$this->addOutput([
 					'title' => $this->getData(['user', $this->getUrl(2), 'firstname']) . ' ' . $this->getData(['user', $this->getUrl(2), 'lastname']),
@@ -368,7 +367,7 @@ class user extends common {
 					AND $this->getData(['user', $userId, 'group']) < self::GROUP_ADMIN
 				) {
 					$this->addOutput([
-						'notification' => 'Seul un administrateur peur se connecter lors d\'une maintenance',
+						'notification' => 'Seul un administrateur peut se connecter lors d\'une maintenance',
 						'redirect' => helper::baseUrl(),
 						'state' => false
 					]);

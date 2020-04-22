@@ -97,8 +97,8 @@ class page extends common {
 				'hideMenuHead' => false,
 				'hideMenuChildren' => false,
 				'editing' => false,
-				'editing_csrf' => '',
-				'editing_time' => 0
+				'editingCsrf' => '',
+				'editingTime' => 0
 			]
 		]);
 		// Met à jour le site map
@@ -125,7 +125,7 @@ class page extends common {
 			]);
 		}
 		// si la page est en édition et que la demande de delete provienne d'une autre session avec l'icône delete de la barre membre
-		elseif($this->getData(['page', $this->geturl(0),'editing']) === true && $this->getData(['page', $this->geturl(0),'editing_csrf']) != $_SESSION['csrf']){
+		elseif($this->getData(['page', $this->geturl(0),'editing']) === true && $this->getData(['page', $this->geturl(0),'editingCsrf']) != $_SESSION['csrf']){
 			// Valeurs en sortie
 			$this->addOutput([
 				'redirect' => helper::baseUrl() . $this->geturl(0),
@@ -262,20 +262,20 @@ class page extends common {
 				// Si le submit provient du bouton Enregistrer on libère le verrou
 				if(isset($_POST['pageEditSubmit'])){
 					$val_editing = false;
-					$val_editing_csrf = '';
-					$val_editing_time = 0;
+					$val_editingCsrf = '';
+					$val_editingTime = 0;
 				}
 				else{
 					//Si la page n'existe pas on initialise sinon on conserve les paramètres
 					if(null === $this->getData(['page', $pageId])){
 						$val_editing = true;
-						$val_editing_csrf = $_SESSION['csrf'];
-						$val_editing_time = time();
+						$val_editingCsrf = $_SESSION['csrf'];
+						$val_editingTime = time();
 					}
 					else{
 						$val_editing = $this->getData(['page', $pageId , 'editing']);
-						$val_editing_csrf = $this->getData(['page', $pageId , 'editing_csrf']);
-						$val_editing_time = $this->getData(['page', $pageId , 'editing_time']);
+						$val_editingCsrf = $this->getData(['page', $pageId , 'editingCsrf']);
+						$val_editingTime = $this->getData(['page', $pageId , 'editingTime']);
 					}
 				}	
 				$this->setData([
@@ -305,8 +305,8 @@ class page extends common {
 						'hideMenuHead' => $this->getinput('pageEditHideMenuHead', helper::FILTER_BOOLEAN),
 						'hideMenuChildren' => $this->getinput('pageEditHideMenuChildren', helper::FILTER_BOOLEAN),
 						'editing' => $val_editing,
-						'editing_csrf' => $val_editing_csrf,
-						'editing_time' => $val_editing_time
+						'editingCsrf' => $val_editingCsrf,
+						'editingTime' => $val_editingTime
 					]
 				]);					
 				
@@ -350,10 +350,10 @@ class page extends common {
 				}
 			}
 			else{
-				//La page est en cours d'édition et editing_time est voisin de time() (le navigateur n'est pas fermé !)
+				//La page est en cours d'édition et editingTime est voisin de time() (le navigateur n'est pas fermé !)
 				if($this->getData(['page', $this->getUrl(2),'editing']) === true
-					&& time() - $this->getData(['page', $this->getUrl(2),'editing_time']) < 120
-				  	&& $this->getData(['page', $this->getUrl(2),'editing_csrf']) != $_SESSION['csrf']){
+					&& time() - $this->getData(['page', $this->getUrl(2),'editingTime']) < 120
+				  	&& $this->getData(['page', $this->getUrl(2),'editingCsrf']) != $_SESSION['csrf']){
 					// Valeurs en sortie
 					$this->addOutput([
 						'redirect' => helper::baseUrl() . $pageId,
@@ -365,8 +365,8 @@ class page extends common {
 				else{
 					//La page va être éditée mise à jour des valeurs editing de la page
 					$this->setData(['page', $this->getUrl(2), 'editing',true]);
-					$this->setData(['page', $this->getUrl(2), 'editing_time',time()]);
-					$this->setData(['page', $this->getUrl(2), 'editing_csrf', $_SESSION['csrf']]);
+					$this->setData(['page', $this->getUrl(2), 'editingTime',time()]);
+					$this->setData(['page', $this->getUrl(2), 'editingCsrf', $_SESSION['csrf']]);
 					// Liste des modules
 					$moduleIds = [];
 					$iterator = new DirectoryIterator('module/');

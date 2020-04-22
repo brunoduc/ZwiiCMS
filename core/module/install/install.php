@@ -83,8 +83,8 @@ class install extends common {
 						'mail' => $userMail,
 						'password' => $this->getInput('installPassword', helper::FILTER_PASSWORD, true),
 						'editing' => false,
-						'editing_time' => 0,
-						'editing_csrf' => ''
+						'editingTime' => 0,
+						'editingCsrf' => ''
 					]
 				]);
 				if ($success === true) { // Formulaire complété envoi du mail											

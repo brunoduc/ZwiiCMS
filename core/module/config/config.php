@@ -408,8 +408,8 @@ class config extends common {
 					'proxyUrl' => $this->getInput('configProxyUrl'),
 					'proxyPort' => $this->getInput('configProxyPort',helper::FILTER_INT),
 					'editing' => false,
-					'editing_time' => 0,
-					'editing_csrf' => ''
+					'editingTime' => 0,
+					'editingCsrf' => ''
 				]
 			]);
 							
@@ -464,7 +464,7 @@ class config extends common {
 		}
 		//Fin de traitement du formulaire, pause du verrou
 		if($this->getData(['config','editing']) === true
-			&& time() - $this->getData(['config', 'editing_time']) < 120 ){
+			&& time() - $this->getData(['config', 'editingTime']) < 120 ){
 			// Valeurs en sortie
 			$this->addOutput([
 				'redirect' => helper::baseUrl(),
@@ -475,8 +475,8 @@ class config extends common {
 		}
 		else{
 			$this->setData(['config', 'editing',true]);
-			$this->setData(['config', 'editing_time',time()]);
-			$this->setData(['config', 'editing_csrf', $_SESSION['csrf']]);
+			$this->setData(['config', 'editingTime',time()]);
+			$this->setData(['config', 'editingCsrf', $_SESSION['csrf']]);
 			// Initialisation du screen 
 			if (!file_exists(self::FILE_DIR.'source/screenshot.png')) {
 				$this->configMetaImage();

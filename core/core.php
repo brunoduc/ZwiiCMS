@@ -1438,12 +1438,12 @@ class core extends common {
 	 * Accès concurrents utilisé par router()
 	 */	 
 	 private function resetAccessToken($pageId) {
-		if(	$this->getData(['page', $pageId, 'editing_csrf']) === $_SESSION['csrf'] && 
+		if(	$this->getData(['page', $pageId, 'editingCsrf']) === $_SESSION['csrf'] && 
 			($this->getUrl(1) === null || 
 			$this->getUrl(1) == 'logout' )){
 				$this->setData(['page', $pageId, 'editing', false]);
-				$this->setData(['page', $pageId, 'editing_time', 0]);
-				$this->setData(['page', $pageId, 'editing_csrf', '']);
+				$this->setData(['page', $pageId, 'editingTime', 0]);
+				$this->setData(['page', $pageId, 'editingCsrf', '']);
 		}
 	 }
 	
@@ -1453,28 +1453,28 @@ class core extends common {
 	 */
 	public function router() {
 		// --------------------------Accès concurrents	-------------------------	
-		// Un script js provoque ici la mise à jour de editing_time tant que la session n'est pas close
+		// Un script js provoque ici la mise à jour de editingTime tant que la session n'est pas close
 		if(strpos($_SERVER['QUERY_STRING'], 'modifeditingtime') !== false){
 			foreach($this->getHierarchy(null,false,null) as $parentId => $childIds){
-				if($this->getData(['page', $parentId, 'editing_csrf']) == $_SESSION['csrf']){
-						$this->setData(['page', $parentId, 'editing_time', $this->getData(['page', $parentId, 'editing_time']) + 60]);
+				if($this->getData(['page', $parentId, 'editingCsrf']) == $_SESSION['csrf']){
+						$this->setData(['page', $parentId, 'editingTime', $this->getData(['page', $parentId, 'editingTime']) + 60]);
 				}
 				foreach($childIds as $childId) {
-					if($this->getData(['page', $childId, 'editing_csrf']) == $_SESSION['csrf']){
-							$this->setData(['page', $childId, 'editing_time', $this->getData(['page', $childId, 'editing_time']) + 60]);
+					if($this->getData(['page', $childId, 'editingCsrf']) == $_SESSION['csrf']){
+							$this->setData(['page', $childId, 'editingTime', $this->getData(['page', $childId, 'editingTime']) + 60]);
 					}		
 				}
 			}
 			foreach($this->getData(['user']) as $userId => $userIds){
-				if($this->getData(['user', $userId, 'editing_csrf']) == $_SESSION['csrf']){
-					$this->setData(['user', $userId, 'editing_time', $this->getData(['user', $userId, 'editing_time']) + 60]);
+				if($this->getData(['user', $userId, 'editingCsrf']) == $_SESSION['csrf']){
+					$this->setData(['user', $userId, 'editingTime', $this->getData(['user', $userId, 'editingTime']) + 60]);
 				}
 			}
-			if($this->getData(['theme', 'editing_csrf']) == $_SESSION['csrf']){
-				$this->setData(['theme', 'editing_time', $this->getData(['theme','editing_time']) + 60]);
+			if($this->getData(['theme', 'editingCsrf']) == $_SESSION['csrf']){
+				$this->setData(['theme', 'editingTime', $this->getData(['theme','editingTime']) + 60]);
 			}
-			if($this->getData(['config', 'editing_csrf']) == $_SESSION['csrf']){
-				$this->setData(['config', 'editing_time', $this->getData(['config','editing_time']) + 60]);
+			if($this->getData(['config', 'editingCsrf']) == $_SESSION['csrf']){
+				$this->setData(['config', 'editingTime', $this->getData(['config','editingTime']) + 60]);
 			}
 			exit();
 		}
@@ -1482,27 +1482,27 @@ class core extends common {
 		/* Verrou sur la gestion des utilisateurs 
 		*/
 		foreach($this->getData(['user']) as $userId => $userIds){
-			if($this->getData(['user', $userId, 'editing_csrf']) == $_SESSION['csrf'] && ($this->getUrl(1) === null || $this->getUrl(1) == 'logout' )){
+			if($this->getData(['user', $userId, 'editingCsrf']) == $_SESSION['csrf'] && ($this->getUrl(1) === null || $this->getUrl(1) == 'logout' )){
 				$this->setData(['user', $userId, 'editing',false]);
-				$this->setData(['user', $userId, 'editing_csrf','']);
-				$this->setData(['user', $userId, 'editing_time',0]);
+				$this->setData(['user', $userId, 'editingCsrf','']);
+				$this->setData(['user', $userId, 'editingTime',0]);
 			}
 		}
 		
 		/* Verrou sur la personnalisation du thème 
 		*/
-		if($this->getData(['theme', 'editing_csrf']) == $_SESSION['csrf'] && ($this->getUrl(1) === null || $this->getUrl(1) == 'logout' )){
+		if($this->getData(['theme', 'editingCsrf']) == $_SESSION['csrf'] && ($this->getUrl(1) === null || $this->getUrl(1) == 'logout' )){
 			$this->setData(['theme', 'editing',false]);
-			$this->setData(['theme', 'editing_csrf','']);
-			$this->setData(['theme', 'editing_time',0]);
+			$this->setData(['theme', 'editingCsrf','']);
+			$this->setData(['theme', 'editingTime',0]);
 		}
 		
 		/* Verrou sur la configuration du site 
 		*/
-		if($this->getData(['config', 'editing_csrf']) == $_SESSION['csrf'] && ($this->getUrl(1) === null || $this->getUrl(1) == 'logout' )){
+		if($this->getData(['config', 'editingCsrf']) == $_SESSION['csrf'] && ($this->getUrl(1) === null || $this->getUrl(1) == 'logout' )){
 			$this->setData(['config', 'editing',false]);
-			$this->setData(['config', 'editing_csrf','']);
-			$this->setData(['config', 'editing_time',0]);
+			$this->setData(['config', 'editingCsrf','']);
+			$this->setData(['config', 'editingTime',0]);
 		}
 		
 		// Verrou sur les pages, pages enfant et barres latérales	

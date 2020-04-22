@@ -435,7 +435,7 @@ class theme extends common {
 	 */
 	public function index() {
 		if($this->getData(['theme','editing']) === true
-			&& time() - $this->getData(['theme', 'editing_time']) < 120 ){
+			&& time() - $this->getData(['theme', 'editingTime']) < 120 ){
 			// Valeurs en sortie
 			$this->addOutput([
 				'redirect' => helper::baseUrl(),
@@ -446,8 +446,8 @@ class theme extends common {
 		}
 		else{
 			$this->setData(['theme', 'editing',true]);
-			$this->setData(['theme', 'editing_time',time()]);
-			$this->setData(['theme', 'editing_csrf', $_SESSION['csrf']]);
+			$this->setData(['theme', 'editingTime',time()]);
+			$this->setData(['theme', 'editingCsrf', $_SESSION['csrf']]);
 			// Valeurs en sortie
 			$this->addOutput([
 				'title' => 'Personnalisation du thème',

@@ -19,21 +19,7 @@ class gallery extends common {
 	const SORT_ASC = 'SORT_ASC';
 	const SORT_DSC = 'SORT_DSC';
 	const SORT_HAND = 'SORT_HAND';
-
-	public static $actions = [
-		'config' => self::GROUP_MODERATOR,
-		'delete' => self::GROUP_MODERATOR,
-		'dirs' => self::GROUP_MODERATOR,
-		'sort' => self::GROUP_MODERATOR,
-		'edit' => self::GROUP_MODERATOR,
-		'index' => self::GROUP_VISITOR		
-	];
-
-	public static $sort = [
-		self::SORT_ASC  => 'Alphabétique ',
-		self::SORT_DSC  => 'Alphabétique inverse',
-		self::SORT_HAND => 'Manuel'
-	];
+	const GALLERY_VERSION = '2.19';		
 
 	public static $directories = [];
 
@@ -47,15 +33,104 @@ class gallery extends common {
 
 	public static $picturesId = [];
 
-	public static $thumbs = [];
+	public static $thumbs = [];	
 
-	const GALLERY_VERSION = '2.15';	
+	public static $actions = [
+		'config' => self::GROUP_MODERATOR,
+		'delete' => self::GROUP_MODERATOR,
+		'dirs' => self::GROUP_MODERATOR,
+		'sort' => self::GROUP_MODERATOR,
+		'edit' => self::GROUP_MODERATOR,
+		'theme' => self::GROUP_MODERATOR,
+		'index' => self::GROUP_VISITOR		
+	];
 
+	public static $sort = [
+		self::SORT_ASC  => 'Alphabétique ',
+		self::SORT_DSC  => 'Alphabétique inverse',
+		self::SORT_HAND => 'Manuel'
+	];
+
+	public static $galleryThemeFlexAlign = [
+		'flex-start' => 'À gauche',
+		'center' => 'Au centre',
+		'flex-end' => 'À droite',
+		'space-around' => 'Distribué avec marges',
+		'space-between' => 'Distribué sans marge',
+	];
+
+	public static $galleryThemeAlign = [
+		'left' => 'À gauche',
+		'center' => 'Au centre',
+		'right' => 'À droite'
+	];
+
+	public static $galleryThemeSize = [
+		'9em'  => 'Très petite',
+		'12em' => 'Petite',
+		'15em' => 'Moyenne',
+		'18em' => 'Grande',
+		'21em' => 'Très grande'
+	];
+
+	public static $galleryThemeLegendHeight = [
+		'.125em'  => 'Très petite',
+		'.25em'  => 'Petite',
+		'.375em'  => 'Moyenne',
+		'.5em'  => 'Grande',
+		'.625em' => 'Très grande'
+	];
+
+	public static $galleryThemeBorder = [
+		'0em' => 'Aucune',
+		'.1em' => 'Très fine',
+		'.3em' => 'Fine',
+		'.5em'  => 'Moyenne',
+		'.7em' => 'Epaisse',
+		'.9em'  => 'Epaisse'
+	];
+
+	public static $galleryThemeOpacity = [
+		'1'   => 'Aucun ',
+		'.9'  => 'Très Discrète',
+		'.8'  => 'Discrète',		
+		'.7'  => 'Moyenne',
+		'.6'  => 'Forte',
+		'.5'  => 'Très forte'
+	];
+
+	public static $galleryThemeMargin = [
+		'0em'    => 'Aucune',
+		'.1em'   => 'Très petite',
+		'.3em'   => 'Petite',
+		'.5em'   => 'Moyenne',
+		'.7em'  => 'Grande',
+		'.9em'  => 'Très grande'
+	];
+
+	public static $galleryThemeRadius = [
+		'0em' => 'Aucun',
+		'.3em' => 'Très léger',
+		'.6em' => 'Léger',
+		'.9em' => 'Moyen',
+		'1.2em' => 'Important',
+		'1.5em' => 'Très important'
+	];
+
+	public static $galleryThemeShadows = [
+		'0px' => 'Aucune',
+		'1px 1px 5px' => 'Très légère',
+		'1px 1px 10px' => 'Légère',
+		'1px 1px 15px' => 'Moyenne',
+		'1px 1px 25px' => 'Importante',
+		'1px 1px 50px' => 'Très importante'
+	];
 
 	/**
-	 * Tri sans bouton
+	 * Tri de la liste des galeries
+	 *
 	 */
-	public function sort () {
+	private function sort () {
 		if($_POST['response']) {
 			$data = explode('&',$_POST['response']);
 			$data = str_replace('galleryTable%5B%5D=','',$data);
@@ -496,6 +571,81 @@ class gallery extends common {
 				'view' => 'index'
 			]);
 		}
+	}
+
+	/**
+	 * Thème de la galerie
+	 */
+	public function theme() {
+		// Jeton incorrect
+		if ($this->getUrl(2) !== $_SESSION['csrf']) {
+			// Valeurs en sortie
+			$this->addOutput([
+				'redirect' => helper::baseUrl() . $this->getUrl(0) . '/config',
+				'notification' => 'Action  non autorisée'
+			]);
+		}
+		// Initialisation des données de thème de la galerie dasn theme.json
+		// Création des valeur par défaut absentes
+		if ( $this->getData(['theme', $this->getUrl(0)]) === null ) {
+			require_once('module/gallery/ressource/defaultdata.php'); 
+			$this->setData(['theme', $this->getUrl(0), theme::$defaultData]);
+		}
+		// Soumission du formulaire
+
+		if($this->isPost()) {
+			$this->setData(['theme', $this->getUrl(0), [
+					'thumbAlign' 	    => $this->getinput('galleryThemeThumbAlign'),
+					'thumbWidth' 	    => $this->getinput('galleryThemeThumbWidth'),
+					'thumbHeight'	    => $this->getinput('galleryThemeThumbHeight'),
+					'thumbMargin'	    => $this->getinput('galleryThemeThumbMargin'),
+					'thumbBorder'	    => $this->getinput('galleryThemeThumbBorder'),
+					'thumbBorderColor'  => $this->getinput('galleryThemeThumbBorderColor'),
+					'thumbOpacity'	    => $this->getinput('galleryThemeThumbOpacity'),
+					'thumbShadows'   	=> $this->getinput('galleryThemeThumbShadows'),
+					'thumbShadowsColor' => $this->getinput('galleryThemeThumbShadowsColor'),
+					'thumbRadius'	    => $this->getinput('galleryThemeThumbRadius'),
+					'legendHeight'	    => $this->getinput('galleryThemeLegendHeight'),
+					'legendAlign'	    => $this->getinput('galleryThemeLegendAlign'),
+					'legendTextColor'   => $this->getinput('galleryThemeLegendTextColor'),
+					'legendBgColor'	    => $this->getinput('galleryThemeLegendBgColor')
+				]
+			]);
+			// Création des fichiers CSS
+			$content = file_get_contents('module/gallery/ressource/vartheme.css');
+			$themeCss = file_get_contents('module/gallery/ressource/theme.css');
+			// Injection des variables			
+			$content = str_replace('#thumbAlign#',$this->getinput('galleryThemeThumbAlign'),$content );			
+			$content = str_replace('#thumbWidth#',$this->getinput('galleryThemeThumbWidth'),$content );
+			$content = str_replace('#thumbHeight#',$this->getinput('galleryThemeThumbHeight'),$content );
+			$content = str_replace('#thumbMargin#',$this->getinput('galleryThemeThumbMargin'),$content );
+			$content = str_replace('#thumbBorder#',$this->getinput('galleryThemeThumbBorder'),$content );
+			$content = str_replace('#thumbBorderColor#',$this->getinput('galleryThemeThumbBorderColor'),$content );
+			$content = str_replace('#thumbOpacity#',$this->getinput('galleryThemeThumbOpacity'),$content );
+			$content = str_replace('#thumbShadows#',$this->getinput('galleryThemeThumbShadows'),$content );
+			$content = str_replace('#thumbShadowsColor#',$this->getinput('galleryThemeThumbShadowsColor'),$content );
+			$content = str_replace('#thumbRadius#',$this->getinput('galleryThemeThumbRadius'),$content );			
+			$content = str_replace('#legendAlign#',$this->getinput('galleryThemeLegendAlign'),$content );			
+			$content = str_replace('#legendHeight#',$this->getinput('galleryThemeLegendHeight'),$content );
+			$content = str_replace('#legendTextColor#',$this->getinput('galleryThemeLegendTextColor'),$content );
+			$content = str_replace('#legendBgColor#',$this->getinput('galleryThemeLegendBgColor'),$content );
+			$success = file_put_contents('module/gallery/view/index/index.css',$content . $themeCss);
+			$success = $success && file_put_contents('module/gallery/view/gallery/gallery.css',$content . $themeCss);
+			// Valeurs en sortie				
+			$this->addOutput([
+				'redirect' => helper::baseUrl() . $this->getUrl() . '/theme',
+				'notification' => $success ? 'Modifications enregistrées' : 'Modifications non enregistées !',
+				'state' => $success
+			]);
+		}
+		// Valeurs en sortie
+		$this->addOutput([
+			'title' => "Thème",
+			'view' => 'theme',
+			'vendor' => [
+				'tinycolorpicker'
+			]
+		]);
 	}
 
 }

@@ -125,10 +125,10 @@ class page extends common {
 			]);
 		}
 		// si la page est en édition et que la demande de delete provienne d'une autre session avec l'icône delete de la barre membre
-		elseif($this->getData(['page', $url[0],'editing']) === true && $this->getData(['page', $url[0],'editing_csrf']) != $_SESSION['csrf']){
+		elseif($this->getData(['page', $this->geturl(0),'editing']) === true && $this->getData(['page', $this->geturl(0),'editing_csrf']) != $_SESSION['csrf']){
 			// Valeurs en sortie
 			$this->addOutput([
-				'redirect' => helper::baseUrl() . $url[0],
+				'redirect' => helper::baseUrl() . $this->geturl(0),
 				'notification' => 'Impossible de supprimer cette page car elle est en édition dans une autre session'
 			]);
 		
@@ -364,10 +364,9 @@ class page extends common {
 				}
 				else{
 					//La page va être éditée mise à jour des valeurs editing de la page
-					$pageIdent = $this->getUrl(2);
-					$this->setData(['page', $pageIdent, 'editing',true]);
-					$this->setData(['page', $pageIdent, 'editing_time',time()]);
-					$this->setData(['page', $pageIdent, 'editing_csrf', $_SESSION['csrf']]);
+					$this->setData(['page', $this->getUrl(2), 'editing',true]);
+					$this->setData(['page', $this->getUrl(2), 'editing_time',time()]);
+					$this->setData(['page', $this->getUrl(2), 'editing_csrf', $_SESSION['csrf']]);
 					// Liste des modules
 					$moduleIds = [];
 					$iterator = new DirectoryIterator('module/');

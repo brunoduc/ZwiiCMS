@@ -1437,7 +1437,7 @@ class core extends common {
 	/**
 	 * Accès concurrents utilisé par router()
 	 */	 
-	 private function acces_raz($pageId) {
+	 private function resetAccessToken($pageId) {
 		if(	$this->getData(['page', $pageId, 'editing_csrf']) === $_SESSION['csrf'] && 
 			($this->getUrl(1) === null || 
 			$this->getUrl(1) == 'logout' )){
@@ -1452,7 +1452,7 @@ class core extends common {
 	 * Routage des modules
 	 */
 	public function router() {
-		// Accès concurrents		
+		// --------------------------Accès concurrents	-------------------------	
 		// Un script js provoque ici la mise à jour de editing_time tant que la session n'est pas close
 		if(strpos($_SERVER['QUERY_STRING'], 'modifeditingtime') !== false){
 			foreach($this->getHierarchy(null,false,null) as $parentId => $childIds){
@@ -1509,11 +1509,12 @@ class core extends common {
 		// Reset des paramètres editing en cas de Retour, clic sur une page du menu ou du footer,
 		// clic sur une icône de la barre de membre et en cas de logout
 		foreach($this->getHierarchy(null,false,null) as $parentId => $childIds){
-			$this->acces_raz($parentId);
+			$this->resetAccessToken($parentId);
 			foreach($childIds as $childId) {
-				$this->acces_raz($childId);
+				$this->resetAccessToken($childId);
 			}
 		}
+		//-------------- FIN ACCESS CONCURRENTS --------------------------------------
 		// Installation
 		if(
 			$this->getData(['user']) === []

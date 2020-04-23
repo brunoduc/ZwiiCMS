@@ -411,7 +411,7 @@ class config extends common {
 					'editingTimer' => 0,
 					'editingCsrf' => ''
 				]
-			]);
+			]);			
 							
 			if(self::$inputNotices === []) {
 				// Ecrire les fichiers de script

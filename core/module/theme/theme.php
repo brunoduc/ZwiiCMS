@@ -435,7 +435,7 @@ class theme extends common {
 	 */
 	public function index() {
 		if($this->getData(['theme','editing']) === true
-			&& time() - $this->getData(['theme', 'editingTimer']) < 120 ){
+			&& time() - $this->getData(['theme', 'editingTimer']) < self::DISCONNECT_TIMEOUT ){
 			// Valeurs en sortie
 			$this->addOutput([
 				'redirect' => helper::baseUrl(),

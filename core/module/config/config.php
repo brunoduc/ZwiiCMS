@@ -464,7 +464,7 @@ class config extends common {
 		}
 		//Fin de traitement du formulaire, pause du verrou
 		if($this->getData(['config','editing']) === true
-			&& time() - $this->getData(['config', 'editingTimer']) < 120 ){
+			&& time() - $this->getData(['config', 'editingTimer']) < self::DISCONNECT_TIMEOUT ){
 			// Valeurs en sortie
 			$this->addOutput([
 				'redirect' => helper::baseUrl(),

@@ -352,7 +352,7 @@ class page extends common {
 			else{
 				//La page est en cours d'édition et editingTime est voisin de time() (le navigateur n'est pas fermé !)
 				if($this->getData(['page', $this->getUrl(2),'editing']) === true
-					&& time() - $this->getData(['page', $this->getUrl(2),'editingTimer']) < 120
+					&& time() - $this->getData(['page', $this->getUrl(2),'editingTimer']) < self::DISCONNECT_TIMEOUT
 				  	&& $this->getData(['page', $this->getUrl(2),'editingCsrf']) != $_SESSION['csrf']){
 					// Valeurs en sortie
 					$this->addOutput([

@@ -251,7 +251,7 @@ class user extends common {
 				]);
 			}
 			if($this->getData(['user', $this->getUrl(2),'editing']) === true
-				&& time() - $this->getData(['user',$this->getUrl(2),'editingTimer']) < 120 ){
+				&& time() - $this->getData(['user',$this->getUrl(2),'editingTimer']) < self::DISCONNECT_TIMEOUT ){
 				// Valeurs en sortie
 				$this->addOutput([
 					'redirect' => helper::baseUrl().'user',

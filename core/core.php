@@ -35,6 +35,9 @@ class common {
 	const THUMBS_SEPARATOR = 'mini_';
 	const THUMBS_WIDTH = 640;
 
+	// Accès concurrents
+	const DISCONNECT_TIMEOUT = 120;
+
 	// Numéro de version 
 	const ZWII_VERSION = '10.0.067';
 	const ZWII_UPDATE_CHANNEL = "v10";

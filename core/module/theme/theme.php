@@ -439,7 +439,7 @@ class theme extends common {
 			// Valeurs en sortie
 			$this->addOutput([
 				'redirect' => helper::baseUrl(),
-				'notification' => 'La personnalisation du thème est déjà en édition, accès impossible',
+				'notification' => 'L`utilisateur <strong>' . $this->getData(['theme', 'editingUserId']) . '</strong> édite le thème, accès verrouillé.',
 				'state' => false
 			]);
 		
@@ -448,6 +448,7 @@ class theme extends common {
 			$this->setData(['theme', 'editing',true]);
 			$this->setData(['theme', 'editingTimer',time()]);
 			$this->setData(['theme', 'editingCsrf', $_SESSION['csrf']]);
+			$this->setData(['theme', 'editingUserId', $this->getUser('id')]);
 			// Valeurs en sortie
 			$this->addOutput([
 				'title' => 'Personnalisation du thème',

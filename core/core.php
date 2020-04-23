@@ -1447,6 +1447,7 @@ class core extends common {
 				$this->setData(['page', $pageId, 'editing', false]);
 				$this->setData(['page', $pageId, 'editingTimer', 0]);
 				$this->setData(['page', $pageId, 'editingCsrf', '']);
+				$this->setData(['page', $pageId, 'editingUserId', '']);
 		}
 	 }
 	
@@ -1485,10 +1486,11 @@ class core extends common {
 		/* Verrou sur la gestion des utilisateurs 
 		*/
 		foreach($this->getData(['user']) as $userId => $userIds){
-			if($this->getData(['user', $userId, 'editingCsrf']) == $_SESSION['csrf'] && ($this->getUrl(1) === null || $this->getUrl(1) == 'logout' )){
+			if( $this->getData(['user', $userId, 'editingCsrf']) == $_SESSION['csrf'] && ($this->getUrl(1) === null || $this->getUrl(1) == 'logout' )){
 				$this->setData(['user', $userId, 'editing',false]);
 				$this->setData(['user', $userId, 'editingCsrf','']);
 				$this->setData(['user', $userId, 'editingTimer',0]);
+				$this->setData(['user', $userId, 'editingUserId','']);
 			}
 		}
 		
@@ -1498,6 +1500,7 @@ class core extends common {
 			$this->setData(['theme', 'editing',false]);
 			$this->setData(['theme', 'editingCsrf','']);
 			$this->setData(['theme', 'editingTimer',0]);
+			$this->setData(['theme', 'editingUserId','']);
 		}
 		
 		/* Verrou sur la configuration du site 
@@ -1506,6 +1509,7 @@ class core extends common {
 			$this->setData(['config', 'editing',false]);
 			$this->setData(['config', 'editingCsrf','']);
 			$this->setData(['config', 'editingTimer',0]);
+			$this->setData(['config', 'editingUserId','']);
 		}
 		
 		// Verrou sur les pages, pages enfant et barres latérales	

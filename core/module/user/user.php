@@ -70,6 +70,7 @@ class user extends common {
 						'editing' => false,
 						'editingTimer' => 0,
 						'editingCsrf' => '',
+						'editingUserId' => '',
 						'connectedTimer' => 0,
 					]
 				]);
@@ -255,7 +256,7 @@ class user extends common {
 				// Valeurs en sortie
 				$this->addOutput([
 					'redirect' => helper::baseUrl().'user',
-					'notification' => 'La configuration de ce membre est déjà en édition, accès impossible',
+					'notification' => 'L`utilisateur <strong>' . $this->getData(['user', $this->getUrl(2),'editingUserId']) . '</strong> édite ce compte, accès verrouillé.',
 					'state' => false
 				]);
 			
@@ -264,6 +265,7 @@ class user extends common {
 				$this->setData(['user', $this->getUrl(2), 'editing',true]);
 				$this->setData(['user', $this->getUrl(2), 'editingTimer',time()]);
 				$this->setData(['user', $this->getUrl(2), 'editingCsrf', $_SESSION['csrf']]);
+				$this->setData(['user', $this->getUrl(2), 'editingUserId', $this->getUser('id')]);
 				// Valeurs en sortie
 				$this->addOutput([
 					'title' => $this->getData(['user', $this->getUrl(2), 'firstname']) . ' ' . $this->getData(['user', $this->getUrl(2), 'lastname']),

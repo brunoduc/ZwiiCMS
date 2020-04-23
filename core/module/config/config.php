@@ -468,7 +468,7 @@ class config extends common {
 			// Valeurs en sortie
 			$this->addOutput([
 				'redirect' => helper::baseUrl(),
-				'notification' => 'La configuration du site est déjà en édition, accès impossible',
+				'notification' => 'L`utilisateur <strong>' . $this->getData(['config', 'editingUserId']) . '</strong> édite la configuration, accès verrouillé.',
 				'state' => false
 			]);
 		
@@ -477,6 +477,7 @@ class config extends common {
 			$this->setData(['config', 'editing',true]);
 			$this->setData(['config', 'editingTimer',time()]);
 			$this->setData(['config', 'editingCsrf', $_SESSION['csrf']]);
+			$this->setData(['config', 'editingUserId', $this->getUser('id')]);
 			// Initialisation du screen 
 			if (!file_exists(self::FILE_DIR.'source/screenshot.png')) {
 				$this->configMetaImage();

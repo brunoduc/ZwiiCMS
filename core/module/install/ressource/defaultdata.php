@@ -27,7 +27,8 @@ class init extends common {
 			'proxyType' => "tcp://",
 			'editing' => false,
 			'editingCsrf' => '',
-			'editingTimer' => 0	
+			'editingTimer' => 0,
+			"editingUserId" => ""
 		],
 		'core' => [
 			'dataVersion' => 10000,
@@ -65,7 +66,9 @@ class init extends common {
 			'hideMenuChildren' =>false,
 			'editing' => false,
 			'editingCsrf' => '',
-			'editingTimer' => 0	
+			'editingTimer' => 0,
+			"editingUserId" => ""
+
 			]
 		],
 		'module' => [],
@@ -167,7 +170,8 @@ class init extends common {
 			'version' => 0,
 			'editing' => false,
 			'editingCsrf' => '',
-			'editingTimer' => 0	
+			'editingTimer' => 0,
+			"editingUserId" => ""	
 		]
     ];
 
@@ -202,7 +206,8 @@ class init extends common {
 			'hideMenuChildren' =>false,
 			'editing' => false,
 			'editingCsrf' => '',
-			'editingTimer' => 0	
+			'editingTimer' => 0,
+			"editingUserId" => ""	
 			],
 			'enfant' => [
 					'typeMenu' => 'text',
@@ -233,7 +238,8 @@ class init extends common {
 				'hideMenuChildren' =>false,
 				'editing' => false,
 				'editingCsrf' => '',
-				'editingTimer' => 0	
+				'editingTimer' => 0,
+				"editingUserId" => ""	
 			],
 			'privee' => [
 					'typeMenu' => 'text',
@@ -263,7 +269,8 @@ class init extends common {
 				'hideMenuChildren' =>false,
 				'editing' => false,
 				'editingCsrf' => '',
-				'editingTimer' => 0	
+				'editingTimer' => 0,
+				"editingUserId" => ""	
 			],
 			'mise-en-page' => [
 				'typeMenu' => 'text',
@@ -292,7 +299,8 @@ class init extends common {
 				'hideMenuChildren' =>false,
 				'editing' => false,
 				'editingCsrf' => '',
-				'editingTimer' => 0	
+				'editingTimer' => 0,
+				"editingUserId" => ""	
 			],
 			'menu-lateral' => [
 				'typeMenu' => 'text',
@@ -320,7 +328,8 @@ class init extends common {
 				'hideMenuChildren' =>false,
 				'editing' => false,
 				'editingCsrf' => '',
-				'editingTimer' => 0	
+				'editingTimer' => 0,
+				"editingUserId" => ""	
 				],				
 			'blog' => [
 				'typeMenu' => 'text',
@@ -346,7 +355,8 @@ class init extends common {
 				'hideMenuChildren' =>false,
 				'editing' => false,
 				'editingCsrf' => '',
-				'editingTimer' => 0	
+				'editingTimer' => 0,
+				"editingUserId" => ""	
 			],
 			'galeries' => [
 				'typeMenu' => 'text',
@@ -372,7 +382,8 @@ class init extends common {
 				'hideMenuChildren' =>false,
 				'editing' => false,
 				'editingCsrf' => '',
-				'editingTimer' => 0	
+				'editingTimer' => 0,
+				"editingUserId" => ""	
 			],
 			'site-de-zwii' => [
 			'typeMenu' => 'text',
@@ -399,7 +410,8 @@ class init extends common {
 			'hideMenuChildren' =>false,
 			'editing' => false,
 			'editingCsrf' => '',
-			'editingTimer' => 0	
+			'editingTimer' => 0,
+			"editingUserId" => ""	
 			],
 			'contact' => [
 				'typeMenu' => 'text',
@@ -425,7 +437,8 @@ class init extends common {
 				'hideMenuChildren' =>false,
 				'editing' => false,
 				'editingCsrf' => '',
-				'editingTimer' => 0	
+				'editingTimer' => 0,
+				"editingUserId" => ""	
 			],
 			'barre' => [
 				'typeMenu' => 'text',
@@ -451,7 +464,8 @@ class init extends common {
 				'hideMenuChildren' =>false,
 				'editing' => false,
 				'editingCsrf' => '',
-				'editingTimer' => 0	
+				'editingTimer' => 0,
+				"editingUserId" => ""	
 			],
 			'barrelateraleavecmenu' => [
 				'typeMenu' => 'text',
@@ -477,7 +491,8 @@ class init extends common {
 				'hideMenuChildren' =>false,
 				'editing' => false,
 				'editingCsrf' => '',
-				'editingTimer' => 0	
+				'editingTimer' => 0,
+				"editingUserId" => ""	
 			],
 			'mentions-legales' => [
 				'typeMenu' => 'text',
@@ -506,7 +521,8 @@ class init extends common {
 				'hideMenuChildren' => false,
 				'editing' => false,
 				'editingCsrf' => '',
-				'editingTimer' => 0	
+				'editingTimer' => 0,
+				"editingUserId" => ""	
 			],
 			'mentions-legales' => [
 				'typeMenu' => 'text',
@@ -533,7 +549,8 @@ class init extends common {
 				'hideMenuChildren' => false,
 				'editing' => false,
 				'editingCsrf' => '',
-				'editingTimer' => 0	
+				'editingTimer' => 0,
+				"editingUserId" => ""
 			],
 		],
 		'module' => [

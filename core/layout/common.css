@@ -24,7 +24,7 @@
 
 html,
 body {
-	min-height: 100%;
+	min-height: 100vh;
 }
 
 
@@ -688,7 +688,7 @@ nav::before {
 }
 
 section {
-	min-height: 450px;
+	min-height: 60vh;
 }
 
 section #sectionTitle {

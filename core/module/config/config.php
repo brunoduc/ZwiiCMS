@@ -413,7 +413,7 @@ class config extends common {
 					'proxyUrl' => $this->getInput('configProxyUrl'),
 					'proxyPort' => $this->getInput('configProxyPort',helper::FILTER_INT)	
 				]
-			]);
+			]);			
 							
 			if(self::$inputNotices === []) {
 				// Ecrire les fichiers de script

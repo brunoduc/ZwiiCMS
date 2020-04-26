@@ -1451,7 +1451,12 @@ class common {
 						}	
 					}			
 				}
-			}				
+			}	
+			// Contrôle des options php.ini pour la mise à jour auto
+			if (helper::urlGetContents('http://zwiicms.com/update/' . common::ZWII_UPDATE_CHANNEL . '/version') ===  false) {
+				$this->setData(['config','autoUpdate',false]);
+			}
+
 			$this->setData(['core', 'dataVersion', 10000]);	
 		}
 		// Version 11.0.00

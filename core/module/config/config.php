@@ -408,7 +408,9 @@ class config extends common {
 					'disablei18n' => $this->getInput('configdisablei18n', helper::FILTER_BOOLEAN),
 					'googTransLogo' => $this->getInput('configdGoogTransLogo', helper::FILTER_BOOLEAN),
 					'i18n' => $this->getData(['config','i18n']),
-					'autoUpdate' => $this->getInput('configAutoUpdate', helper::FILTER_BOOLEAN),
+					'autoUpdate' => helper::urlGetContents('http://zwiicms.com/update/' . common::ZWII_UPDATE_CHANNEL . '/version') === false 
+									? false
+									: $this->getInput('configAutoUpdate', helper::FILTER_BOOLEAN),
 					'proxyType' => $this->getInput('configProxyType'),
 					'proxyUrl' => $this->getInput('configProxyUrl'),
 					'proxyPort' => $this->getInput('configProxyPort',helper::FILTER_INT)	

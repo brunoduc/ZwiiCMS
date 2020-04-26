@@ -219,26 +219,38 @@
 	<div class="col12">
 		<div class="block">
 			<h4>Mise à jour</h4>
+			<?php $error = helper::urlGetContents('http://zwiicms.com/update/' . common::ZWII_UPDATE_CHANNEL . '/version');?>
+			<?php if ($error !== false) : ?>
+				<?php $error = true; ?>
+			<?php endif;?>
+			<div class="row">
+				<div class="col12">
+					<?php echo 'Vous disposez de ZwiiCMS version <strong>' . common::ZWII_VERSION . '</strong>' . '.'; ?>
+
+					<?php if ($error): ?>
+						<?php echo 'La version de la mise à jour en ligne est <strong>' . helper::urlGetContents('http://zwiicms.com/update/' . common::ZWII_UPDATE_CHANNEL . '/version') . '</strong>' . '.';?>
+					<?php else: ?>						
+						<p>Malheureusement, la configuration du serveur n'autorise pas la détection des mises à jour en ligne, merci d'activer l'option dans php.ini :	<code>allow_url_fopen = On </code> .
+						Consultez la base de connaissance de votre hébergeur, ou interrogez le support technique pour savoir comment procéder. </p><p>La mise à jour devra s'effectuer par transfert de fichiers <strong>à l'exception du dossier site</strong>.
+						<a href="https://zwiicms.com" target="_blank">Cliquez sur ce lien</a> pour connaître la version disponible en ligne.</p>
+					<?php endif;?>					
+				</div>	
+			</div>
 			<div class="row">
 				<div class="col6">
 					<?php echo template::checkbox('configAutoUpdate', true, 'Recherche de mise à jour automatisée ', [
-							'checked' => $this->getData(['config', 'autoUpdate']),
-							'help' => 'Vérification de l\'existence d\'une mise à jour en ligne une fois par jour.'
+							'checked' => $error ? $this->getData(['config', 'autoUpdate']) : false,
+							'help' => 'Vérification de l\'existence d\'une mise à jour en ligne une fois par jour.',
+							'disabled' => !$error
 						]); ?>
 				</div>			
 				<div class="col3">
 					<?php echo template::button('configUpdateForced', [
 						'href' => helper::baseUrl() . 'install/update',
-						'value' => 'Mise à jour forcée'
+						'value' => 'Mise à jour forcée',
+						'disabled' => !$error
 					]); ?>
 				</div>		
-			</div>
-			<div class="row">
-				<div class="col12">
-					<?php	echo 'Vous disposez de ZwiiCMS version <strong>' . common::ZWII_VERSION . '</strong>'; 
-							echo '. La version de la mise à jour en ligne est <strong>' . file_get_contents('http://zwiicms.com/update/' . common::ZWII_UPDATE_CHANNEL . '/version') . '</strong>';
-					?>						
-				</div>	
 			</div>
 		</div>
 	</div>

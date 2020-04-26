@@ -39,7 +39,7 @@ class common {
 	const DISCONNECT_TIMEOUT = 120;
 
 	// Numéro de version 
-	const ZWII_VERSION = '10.0.069';
+	const ZWII_VERSION = '10.0.070';
 	const ZWII_UPDATE_CHANNEL = "v10";
 
 	public static $actions = [];
@@ -1217,7 +1217,12 @@ class common {
 						}	
 					}			
 				}
-			}				
+			}	
+			// Contrôle des options php.ini pour la mise à jour auto
+			if (helper::urlGetContents('http://zwiicms.com/update/' . common::ZWII_UPDATE_CHANNEL . '/version') ===  false) {
+				$this->setData(['config','autoUpdate',false]);
+			}
+
 			$this->setData(['core', 'dataVersion', 10000]);	
 		}
 	}

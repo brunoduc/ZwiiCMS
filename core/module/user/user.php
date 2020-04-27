@@ -341,7 +341,7 @@ class user extends common {
 						'value' => template::ico('cancel')
 					])
 				];
-		}
+			}
 		}
 		// Valeurs en sortie
 		$this->addOutput([

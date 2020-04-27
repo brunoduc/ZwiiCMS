@@ -228,6 +228,7 @@
 			<!-- footer -->
 			<?php
 			// Déterminer la position
+			$positionFixed = '';
 			if(
 				$this->getData(['theme', 'footer', 'position']) === 'site'
 				// Affiche toujours le pied de page pour l'édition du thème
@@ -235,8 +236,7 @@
 					$this->getData(['theme', 'footer', 'position']) === 'hide'
 					AND $this->getUrl(0) === 'theme'
 				)
-			) 	{	$position = 'site';
-					$positionFixed = '';	
+			) 	{	$position = 'site';						
 			  	} else {
 					$position = 'body';
 					if ( $this->getData(['theme', 'footer', 'fixed']) === true) {

@@ -39,7 +39,7 @@ class common {
 	const DISCONNECT_TIMEOUT = 120;
 
 	// Numéro de version 
-	const ZWII_VERSION = '10.0.073';
+	const ZWII_VERSION = '10.0.077';
 	const ZWII_UPDATE_CHANNEL = "v10";
 
 	public static $actions = [];
@@ -1630,13 +1630,16 @@ class core extends common {
 		}
 		// Importe le module
 		else {
-			// Id du module, et valeurs en sortie de la page si il s'agit d'un module de page
+			// Id du module, et valeurs en sortie de la page si il s'agit d'un module de page			
 
 			if($access AND $this->getData(['page', $this->getUrl(0), 'moduleId'])) {
 				$moduleId = $this->getData(['page', $this->getUrl(0), 'moduleId']);
 				$this->addOutput([
 					'title' => $title,
-					'metaDescription' => $this->getData(['page', $this->getUrl(0), 'metaDescription']),
+					// Meta description = 160 premiers caractères de l'article
+					'metaDescription' => $this->getData(['page',$this->getUrl(0),'moduleId']) === 'blog' && !empty($this->getUrl(1))  
+										? strip_tags(substr($this->getData(['module',$this->getUrl(0),$this->getUrl(1),'content']) ,0,159))
+										: $this->getData(['page', $this->getUrl(0), 'metaDescription']),
 					'metaTitle' => $this->getData(['page', $this->getUrl(0), 'metaTitle']),
 					'typeMenu' => $this->getData(['page', $this->getUrl(0), 'typeMenu']),
 					'iconUrl' => $this->getData(['page', $this->getUrl(0), 'iconUrl']),
@@ -1916,7 +1919,7 @@ class layout extends common {
 				OR $this->getData(['page', $this->getUrl(0), 'hideTitle']) === false
 			)
 		) {
-			echo '<h2 id="sectionTitle">' . $this->core->output['title'] . '</h2>';				
+			echo '<h1 id="sectionTitle">' . $this->core->output['title'] . '</h1>';
 		}
 		echo $this->core->output['content'];
 
@@ -2344,8 +2347,8 @@ class layout extends common {
 	 * Affiche la meta description
 	 */
 	public function showMetaDescription() {
-		echo '<meta name="description" content="' . $this->core->output['metaDescription'] . '" />';
-		echo '<meta property="og:description" content="' . $this->core->output['metaDescription'] . '" />';
+			echo '<meta name="description" content="' . $this->core->output['metaDescription'] . '" />';
+			echo '<meta property="og:description" content="' . $this->core->output['metaDescription'] . '" />';
 	}
 
 	/**

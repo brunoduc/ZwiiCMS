@@ -580,7 +580,7 @@ class init extends common {
 						'icebergjpg' => 'Un iceberg',
 						'meadowjpg' => 'Une prairie'
 					],
-					'position' => [
+					'positions' => [
 						'desertjpg' => 3,
 						'icebergjpg' => 1,
 						'meadowjpg' => 2
@@ -599,7 +599,7 @@ class init extends common {
 						'cosmosjpg' => 'Le cosmos',
 						'nebulajpg' => 'Une nébuleuse'
 					],
-					'position' => [
+					'positions' => [
 						'earthjpg' => 1,
 						'cosmosjpg' => 3,
 						'nebulajpg' => 2

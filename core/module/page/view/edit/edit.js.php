@@ -22,6 +22,20 @@ $("#pageEditDelete").on("click", function() {
 	});
 });
 
+$("#pageEditSubmit").on("click", function() {
+	var oldModule = $("#pageEditModuleIdOld").val();
+	var oldModuleText =  $("#pageEditModuleIdOldText").val();
+	var newModule = $("#pageEditModuleId").val();
+	if ( oldModule !== "" && 
+		 oldModule !== newModule) {
+		var _this = $(this);
+		return core.confirm("Les données du module " + oldModuleText + " seront effacées. Confirmez-vous ?", function() {
+			$(location).attr("href", _this.attr("href"));
+		});
+	}
+});
+
+
 /** 
 * Paramètres par défaut au chargement
 */ 

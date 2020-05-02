@@ -354,8 +354,7 @@ class page extends common {
 					// Valeurs en sortie
 					$this->addOutput([
 						'redirect' => helper::baseUrl() . $pageId,
-						'notification' => 'L`utilisateur <strong>' . $this->getData(['page', $this->getUrl(2),'editingUserId']) . '</strong> éditer cette page, accès verrouillé.',
-						'state' => false
+						'notification' => 'L`utilisateur <strong>' . $this->getData(['page', $this->getUrl(2),'editingUserId']) . '</strong> édite cette page, accès verrouillé.',						'state' => false
 					]);
 				
 				}

@@ -35,7 +35,7 @@ class common {
 	const THUMBS_WIDTH = 640;
 
 	// Numéro de version 
-	const ZWII_VERSION = '11.0.163.dev';
+	const ZWII_VERSION = '11.0.164.dev';
 	const ZWII_UPDATE_CHANNEL = "v11";
 
 	public static $actions = [];
@@ -1434,9 +1434,9 @@ class common {
 							$this->setdata(['module',$parent,$galleryKey,'config','position',$i++]);
 						}						
 						// Positions des images, tri manuel
-						if ( $this->getdata(['module',$parent,$galleryKey,'position']) === NULL) {
+						if ( $this->getdata(['module',$parent,$galleryKey,'positions']) === NULL) {
 							$c = count($this->getdata(['module',$parent,$galleryKey,'legend']));
-							$this->setdata(['module',$parent,$galleryKey,'position', range(0,$c-1) ]);
+							$this->setdata(['module',$parent,$galleryKey,'positions', range(0,$c-1) ]);
 						}
 						// Image de couverture
 						if ( $this->getdata(['module',$parent,$galleryKey,'config','homePicture']) === NULL)  {

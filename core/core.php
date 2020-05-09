@@ -35,7 +35,7 @@ class common {
 	const THUMBS_WIDTH = 640;
 
 	// Numéro de version 
-	const ZWII_VERSION = '11.0.168.dev';
+	const ZWII_VERSION = '11.0.169.dev';
 	const ZWII_UPDATE_CHANNEL = "v11";
 
 	public static $actions = [];
@@ -90,7 +90,7 @@ class common {
 		'metaDescription' => '',
 		'metaTitle' => '',
 		'notification' => '',
-		'redirect' => '',
+		'redirect' => '',		
 		'script' => '',
 		'showBarEditButton' => false,
 		'showPageContent' => false,
@@ -111,7 +111,8 @@ class common {
 			'zwiico',
 			'imagemap',
 			'simplelightbox',
-			'translate'
+			'translate',
+			'fullpage'
 		],
 		'view' => ''
 	];
@@ -1549,9 +1550,10 @@ class core extends common {
 			$css .= 'body,.block h4{color:' . $this->getData(['theme', 'text', 'textColor']) . '}';
 			$css .= 'select,input[type=\'email\'],input[type=\'text\'],textarea{color:' . $this->getData(['theme', 'text', 'backgroundColor']) . '}';
 			// Couleur fixée dans admin.css
-			//$css .= '.button.buttonGrey,.button.buttonGrey:hover{color:' . $this->getData(['theme', 'text', 'textColor']) . '}';
+			//$css .= '.button.buttonGrey,.button.buttonGrey:hover{color:' . $this->getData(['theme', 'text', 'textColor']) . '}';			
 			$css .= '.container{max-width:' . $this->getData(['theme', 'site', 'width']) . '}';
-			$css .= $this->getData(['theme', 'site', 'width']) === '100%' ? '#site{margin:0 auto !important;} body{margin:0 auto !important;}  #bar{margin:0 auto !important;} body > header{margin:0 auto !important;} body > nav {margin: 0 auto !important;} body > footer {margin:0 auto !important;}': '';
+			$margin = $this->getData(['theme', 'site', 'margin']) ? '0' : '20px';			
+			$css .= $this->getData(['theme', 'site', 'width']) === '100%' ? '#site{margin:0 auto !important;} body{margin:0 auto !important;}  #bar{margin:0 auto !important;} body > header{margin:0 auto !important;} body > nav {margin: 0 auto !important;} body > footer {margin:0 auto !important;}': "#site{margin: " . $margin . " auto !important;} body{margin:0px 10px;}  #bar{margin: 0 -10px;} body > header{margin: 0 -10px;} body > nav {margin: 0 -10px;} body > footer {margin: 0 -10px;} ";
 			$css .= $this->getData(['theme', 'site', 'width']) === '750px' ? '.button, button{font-size:0.8em;}' : '';
 			$css .= '#site{background-color:' . $this->getData(['theme', 'site', 'backgroundColor']) . ';border-radius:' . $this->getData(['theme', 'site', 'radius']) . ';box-shadow:' . $this->getData(['theme', 'site', 'shadow']) . ' #212223;}';
 			$css .= '.editorWysiwyg {background-color:' . $this->getData(['theme', 'site', 'backgroundColor']) . ';}';
@@ -1843,10 +1845,6 @@ class core extends common {
 						}
 						// Sinon traitement des données de sortie qui requiert qu'aucune notice soit présente
 						else {
-							// Enregistrement des données							
-							//if($output['state'] !== false) {
-								//$this->setData([$module->getData()]);
-							//}							
 							// Notification
 							if($output['notification']) {
 								if($output['state'] === true) {

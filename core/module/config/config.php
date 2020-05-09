@@ -355,7 +355,7 @@ class config extends common {
 			// Met à jours les URL dans les contenus de page
 					
 			// Message de notification
-			$notification  = $success === true ? 'Sauvegarde importée avec succès' : 'Erreur d\'extraction'; 
+			$notification  = $success === true ? 'Sauvegarde importée avec succès' : 'Une erreur s\'est produite'; 
 			$redirect = $this->getInput('configManageImportUser', helper::FILTER_BOOLEAN) === true ?  helper::baseUrl() . 'config/manage' : helper::baseUrl() . 'user/login/';
 			// Valeurs en sortie erreur	
 			$this->addOutput([
@@ -519,12 +519,39 @@ class config extends common {
 				}
 			}
 		}	
+		// Traiter les modules dont la redirection
+		$content = $this->getdata(['module']);
+		$replace = $this->recursive_array_replace('href="' . $old , 'href="'. $new, $content, $c1);
+		$replace = $this->recursive_array_replace('src="' . $old , 'src="'. $new, $replace, $c2);
+		if ($content !== $replace) {
+			$this->setdata(['module',$replace]);			
+			$c3 += $c1 + $c2;
+			$success = true;
+		}
+		// Mettre à jour la base URl
 		$this->setData(['core','baseUrl',helper::baseUrl(true,false)]);
 		// Valeurs en sortie
 		$this->addOutput([
-			'notification' => $success ? $c3. ' conversion' . ($c3 > 1 ? 's' : '') . ' effectué' . ($c3 > 1 ? 's' : '') : 'Aucune conversion',
+			'notification' => $success ? $c3. ' conversion' . ($c3 > 1 ? 's' : '') . ' effectuée' . ($c3 > 1 ? 's' : '') : 'Aucune conversion',
 			'redirect' => helper::baseUrl() . 'config/manage',
 			'state' => $success ? true : false
 		]);
 	}
+
+	private function recursive_array_replace ($find, $replace, $array, &$count) {	
+		if (!is_array($array)) {
+			return str_replace($find, $replace, $array, $count);			
+		}
+	
+		$newArray = [];
+		foreach ($array as $key => $value) {
+			$newArray[$key] = $this->recursive_array_replace($find, $replace, $value,$c);	
+			$count += $c;
+			if ($key== 'url') {
+				echo 'key';
+			}
+		}
+		return $newArray;
+	}
+
 }

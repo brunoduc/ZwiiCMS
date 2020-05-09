@@ -16,28 +16,18 @@
 - Améliorations :
     - Architecture de stockage des données.
         - Les données sont désormais stockées dans des fichiers distincts (core, config, theme, user, page et module).
-        - Les données relatives aux pages et aux modules sont stockées dans un dossier localisé fr par défaut.
-    - Gestion des données. 
-        - Le système ne conserve plus en mémoire l'intégralité des données de site comme dans les versions précédentes.    
+        - Les données relatives aux pages et aux modules sont stockées dans un dossier localisé fr par défaut en préaration de la version multilangues.
+    - Gestion des données :
+        - Le système ne conserve plus en mémoire l'intégralité des données de site comme dans les versions précédentes.
         - Les données du site sont chargées à la demande au lieu d'être lues dans leur intégralité.
-        - Les mises à jour et effacement sont appliquées en direct sur le disque.
-    - Installation : 
-        - Les fichiers de données manquants sont réinitialisés au cas par cas et plus dans leur globalité.
-        - Une notification est affichée quand un fichier  de données manquant a été réinstallé.
-        - La suppression de user.json entraîne le déclenchement de la procédure d'installation.
-        - Thème à l'installation, la bannière et le favicon sont livrés dans les paramètres de l'installation et copiés dans site.
-    - Importation : 
-        - L'importation des données est possible uniquement à partir d'une version 9.
-        - Fonction d'import des données provenant d'autres version de ZwiiCMS, avec option de préservation des données utilisateurs.
-        - Nouveau masque dédié à la sauvegarde automatique, à l'import et à l'export des données de site.
+        - Les mises à jour et effacements sont appliquées en direct sur le disque.
 - Modifications :
     - Module gallery optimisé, tri dynamique, choix du thème.
-    - Module blog  présentation optimisée avec options de position de l'image, la métadescription est le contenu de l'article.
-    - Module news, simlification de la présentation.
+    - Module blog présentation optimisée avec options de position de l'image, la métadescription est le contenu de l'article.
     - Chargement paresseux des images.
     - Edition de page : suppression de l'option d'ouverture dans une lity.
     - Protection des données des modules en cas de changement lors de l'édition d'une page.
-- Corrections de bug :
+Corrections de bug :
     - Mise à jour automatique : procédure modifiée, désactivée si allow_url_fopen = off sur le serveur
 
 ## version 9.2.28

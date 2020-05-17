@@ -31,3 +31,6 @@ site/data/head.inc.html
 sitemap.xml.gz
 sitemap.xml
 robots.txt
+
+# Fichier htaccess
+.htaccess

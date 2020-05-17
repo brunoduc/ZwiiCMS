@@ -1,0 +1,224 @@
+/**
+ * Voici une feuille de style type, bien entendu vous pouvez ajouter
+ * ou supprimer des propriétés CSS en fonction de vos besoins.
+ */
+
+/**
+ * Éléments principaux
+ */
+
+
+/* 
+* Grille du site
+* Barres et page
+*/
+#contentLeft {
+}
+#contentRight {
+}
+#contentSite {
+}
+
+/* Bannière */
+header {
+}
+
+/* Titre de la bannière */
+header span {
+}
+
+/* Menu */
+nav {
+}
+
+/* Items du menu */
+nav a {
+}
+
+/* Items au survol du menu */
+nav a:hover {
+}
+
+/* Item courant du menu */
+nav a.active {
+}
+
+/* Menu latéral */
+/* aspect des puces */
+ul #menuSide  {
+} 
+/* Block menu à droite */
+#menuSideRight {
+}
+/* Block menu à gauche */
+#menuSideLeft {
+}
+
+
+/* Bas de page */
+footer {
+}
+
+footer #footersite, #footerbody {
+}
+
+/* Liens du bas de page */
+footer #footersite, #footerbody a {
+}
+
+/* footer bloc gauche */
+footer #footersiteLeft, #footerbodyLeft  {
+}
+
+/* footer bloc central */
+footer #footersiteCenter, #footerbodyCenter {
+}
+
+/* footer bloc droite */
+footer #footersiteRight, #footerbodyRight {
+}
+
+
+
+/**
+ * Éléments de contenu
+ */
+
+/* Titres */
+h1,
+h2,
+h3,
+h4 {
+  margin: 0px;
+  font-weight: bold;
+  font-family:'tangerine',cursive;
+  color: black;
+}
+h1 {
+  font-size: 3em;
+  text-align: center;
+}
+h2 {
+  font-size: 2.5em;
+  margin-left: 40px;
+}
+h3 {
+  font-size: 2em;
+  margin-left: 20px;
+}
+h4 {
+  font-size: 1.5em;
+}
+
+/* Liens */
+a {
+}
+
+/* Liens au survol */
+a:hover {
+}
+
+/* Liens au clic */
+a:active {
+}
+
+/* Boutons */
+.button,
+button[type='submit'],
+.pagination a {
+}
+
+/* Boutons au survol */
+.button:hover,
+button[type='submit']:hover,
+.pagination a:hover {
+}
+
+/* Boutons au clic */
+.button:active,
+button[type='submit']:active,
+.pagination a:active {
+}
+
+/* Cases à cocher */
+input[type='checkbox']:checked + label:before {
+}
+
+/* Cases à cocher au survol */
+input[type='checkbox']:not(:active):checked:hover + label:before,
+input[type='checkbox']:active + label:before {
+}
+
+/* Champs de formulaire */
+input[type='text'],
+input[type='password'],
+.inputFile,
+select,
+textarea {
+}
+
+/* Champs de formulaire au survol */
+input[type='text']:hover,
+input[type='password']:hover,
+.inputFile:hover,
+select:hover,
+textarea:hover {
+}
+
+/* Modules News et Blog */
+
+.blogDate {
+}
+
+.blogPicture {
+}
+
+.blogPicture img {
+}
+
+.blogComment {
+}
+
+.blogTitle {
+}
+
+.blogContent {
+}
+
+.newsTitle {
+    /*background-color: grey;*/
+}
+
+.newsContent {
+}
+
+.newsSignature {
+    color: 	#404040;
+}
+pre {
+  color: white;
+  display: block;
+  font-family: monospace;
+  font-size: 0.8em;
+  white-space: pre;
+  background-color: #333;
+  overflow: auto;
+  margin: 9px 0.2em 1em;
+  padding: 0.3em 0.5em;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+
+@font-face {
+    font-family: 'GreatVibesRegular';
+    src: url('/site/data/fonts/GreatVibesRegular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'tangerine';
+    src: url('/site/data/fonts/tangerine.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
